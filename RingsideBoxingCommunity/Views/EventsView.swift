@@ -5,7 +5,7 @@ struct EventsView: View {
     @State private var selectedWeekOffset: Int = 0
     @State private var carouselIndex: Int = 0
     @State private var appearAnimation: Bool = false
-    @State private var autoScrollTimer: Timer?
+    @State private var autoScrollTask: Task<Void, Never>?
 
     private let calendar = Calendar.current
 
@@ -84,7 +84,8 @@ struct EventsView: View {
                 startAutoScroll()
             }
             .onDisappear {
-                stopAutoScroll()
+                autoScrollTask?.cancel()
+                autoScrollTask = nil
             }
             .onChange(of: selectedWeekOffset) { _, _ in
                 carouselIndex = 0
@@ -266,20 +267,16 @@ struct EventsView: View {
     }
 
     private func startAutoScroll() {
-        stopAutoScroll()
-        autoScrollTimer = Timer.scheduledTimer(withTimeInterval: 2.5, repeats: true) { _ in
-            Task { @MainActor in
-                guard !topFights.isEmpty else { return }
+        autoScrollTask?.cancel()
+        autoScrollTask = Task {
+            while !Task.isCancelled {
+                try? await Task.sleep(for: .seconds(2.5))
+                guard !Task.isCancelled, !topFights.isEmpty else { continue }
                 withAnimation(.easeInOut(duration: 0.5)) {
                     carouselIndex = (carouselIndex + 1) % topFights.count
                 }
             }
         }
-    }
-
-    private func stopAutoScroll() {
-        autoScrollTimer?.invalidate()
-        autoScrollTimer = nil
     }
 }
 
