@@ -13,19 +13,18 @@ struct FightDetailView: View {
         ScrollView {
             VStack(spacing: 0) {
                 heroHeader
-                fighterInfoCard
-                liveResultBlock
-                    .padding(.top, 12)
-                overallRatingBlock
-                    .padding(.top, 16)
-                roundByRoundStrip
-                    .padding(.top, 16)
-                actionsRow
-                    .padding(.top, 14)
-                discussionCarousel
-                    .padding(.top, 20)
+                    .padding(.bottom, 20)
+
+                VStack(spacing: 20) {
+                    liveResultBlock
+                    overallRatingBlock
+                    roundByRoundStrip
+                    actionsRow
+                    discussionCarousel
+                }
+                .padding(.horizontal, 16)
             }
-            .padding(.bottom, 32)
+            .padding(.bottom, 40)
         }
         .scrollIndicators(.hidden)
         .background(MeshBackgroundView())
@@ -59,51 +58,32 @@ struct FightDetailView: View {
 
     private var heroHeader: some View {
         VStack(spacing: 0) {
-            Text(eventNameForFight.uppercased())
-                .font(.system(size: 22, weight: .heavy, design: .default).width(.compressed))
-                .foregroundStyle(.white)
-                .multilineTextAlignment(.center)
-                .padding(.top, 4)
+            VStack(spacing: 4) {
+                Text(eventNameForFight.uppercased())
+                    .font(.system(size: 20, weight: .heavy, design: .default).width(.compressed))
+                    .foregroundStyle(.white)
+                    .multilineTextAlignment(.center)
 
-            Text(eventSubtitle)
-                .font(.system(.caption, weight: .medium))
-                .foregroundStyle(.white.opacity(0.4))
-                .padding(.top, 2)
-
-            HStack(alignment: .bottom, spacing: 0) {
-                fighterPhoto(fighter: fight.fighterA, alignment: .leading)
-
-                VStack(spacing: 6) {
-                    if fight.status == .live {
-                        HStack(spacing: 5) {
-                            LiveDot()
-                            Text("RD \(fight.currentRound ?? 1)/\(fight.scheduledRounds)")
-                                .font(.system(.caption2, weight: .bold).width(.compressed))
-                                .foregroundStyle(RingsideTheme.liveRed)
-                        }
-                    }
-
-                    Text("VS")
-                        .font(.system(size: 36, weight: .black, design: .default).width(.compressed))
-                        .foregroundStyle(RingsideTheme.gold)
-                        .tracking(4)
-
-                    statusLabel
-                }
-                .frame(width: 80)
-                .padding(.bottom, 40)
-
-                fighterPhoto(fighter: fight.fighterB, alignment: .trailing)
+                Text(eventSubtitle)
+                    .font(.system(.caption2, weight: .medium))
+                    .foregroundStyle(.white.opacity(0.35))
             }
-            .padding(.top, 8)
+            .padding(.top, 4)
+
+            HStack(alignment: .center, spacing: 0) {
+                fighterColumn(fighter: fight.fighterA)
+                centerVS
+                fighterColumn(fighter: fight.fighterB)
+            }
+            .padding(.top, 12)
         }
     }
 
-    private func fighterPhoto(fighter: Fighter, alignment: HorizontalAlignment) -> some View {
-        VStack(spacing: 0) {
+    private func fighterColumn(fighter: Fighter) -> some View {
+        VStack(spacing: 10) {
             if let urlString = fighter.imageURL, let url = URL(string: urlString) {
                 Color.clear
-                    .frame(height: 220)
+                    .frame(width: 130, height: 180)
                     .overlay {
                         AsyncImage(url: url) { phase in
                             switch phase {
@@ -122,54 +102,91 @@ struct FightDetailView: View {
                     .clipShape(.rect(cornerRadius: 16))
                     .overlay(
                         LinearGradient(
-                            colors: [.clear, .clear, Color(red: 0.04, green: 0.04, blue: 0.07).opacity(0.9)],
+                            colors: [.clear, .clear, RingsideTheme.deepBackground.opacity(0.85)],
                             startPoint: .top,
                             endPoint: .bottom
                         )
                         .clipShape(.rect(cornerRadius: 16))
                     )
                     .overlay(alignment: .bottom) {
-                        VStack(spacing: 2) {
-                            Text(fighter.country)
-                                .font(.title3)
-                            Text(fighter.name.components(separatedBy: " ").last ?? "")
-                                .font(.system(.subheadline, weight: .heavy).width(.compressed))
-                                .foregroundStyle(.white)
-                        }
-                        .padding(.bottom, 8)
-                    }
-            } else {
-                ZStack {
-                    RoundedRectangle(cornerRadius: 16, style: .continuous)
-                        .fill(
-                            LinearGradient(
-                                colors: [Color.white.opacity(0.06), Color.white.opacity(0.02)],
-                                startPoint: .top, endPoint: .bottom
-                            )
-                        )
-                        .frame(height: 220)
-                    VStack(spacing: 8) {
-                        Image(systemName: "figure.boxing")
-                            .font(.system(size: 64))
-                            .foregroundStyle(.white.opacity(0.15))
                         Text(fighter.country)
                             .font(.title3)
-                        Text(fighter.name.components(separatedBy: " ").last ?? "")
-                            .font(.system(.subheadline, weight: .heavy).width(.compressed))
-                            .foregroundStyle(.white)
+                            .padding(.bottom, 6)
                     }
+            } else {
+                RoundedRectangle(cornerRadius: 16, style: .continuous)
+                    .fill(
+                        LinearGradient(
+                            colors: [Color.white.opacity(0.06), Color.white.opacity(0.02)],
+                            startPoint: .top, endPoint: .bottom
+                        )
+                    )
+                    .frame(width: 130, height: 180)
+                    .overlay {
+                        VStack(spacing: 8) {
+                            Image(systemName: "figure.boxing")
+                                .font(.system(size: 48))
+                                .foregroundStyle(.white.opacity(0.12))
+                            Text(fighter.country)
+                                .font(.title3)
+                        }
+                    }
+            }
+
+            VStack(spacing: 2) {
+                Text(fighter.name.components(separatedBy: " ").last ?? "")
+                    .font(.system(.subheadline, weight: .heavy).width(.compressed))
+                    .foregroundStyle(.white)
+                Text(fighter.record)
+                    .font(.system(.caption2, weight: .medium))
+                    .foregroundStyle(.white.opacity(0.35))
+                if !fighter.nickname.isEmpty {
+                    Text("\"\(fighter.nickname)\"")
+                        .font(.system(.caption2, weight: .medium).italic())
+                        .foregroundStyle(RingsideTheme.gold.opacity(0.5))
                 }
             }
         }
         .frame(maxWidth: .infinity)
     }
 
+    private var centerVS: some View {
+        VStack(spacing: 8) {
+            if fight.status == .live {
+                HStack(spacing: 4) {
+                    LiveDot()
+                    Text("RD \(fight.currentRound ?? 1)/\(fight.scheduledRounds)")
+                        .font(.system(.caption2, weight: .bold).width(.compressed))
+                        .foregroundStyle(RingsideTheme.liveRed)
+                }
+            }
+
+            Text("VS")
+                .font(.system(size: 32, weight: .black, design: .default).width(.compressed))
+                .foregroundStyle(RingsideTheme.gold)
+                .tracking(4)
+
+            statusLabel
+
+            VStack(spacing: 2) {
+                Text(fight.weightClass.rawValue.uppercased())
+                    .font(.system(.caption2, weight: .bold).width(.compressed))
+                    .foregroundStyle(RingsideTheme.gold.opacity(0.45))
+                Text("\(fight.scheduledRounds) RDS")
+                    .font(.system(size: 9, weight: .semibold).width(.compressed))
+                    .foregroundStyle(.white.opacity(0.2))
+            }
+            .padding(.top, 2)
+        }
+        .frame(width: 80)
+    }
+
     private var fighterPlaceholder: some View {
         ZStack {
             Color.white.opacity(0.04)
             Image(systemName: "figure.boxing")
-                .font(.system(size: 54))
-                .foregroundStyle(.white.opacity(0.12))
+                .font(.system(size: 48))
+                .foregroundStyle(.white.opacity(0.1))
         }
     }
 
@@ -183,7 +200,7 @@ struct FightDetailView: View {
         case .upcoming:
             Text(fight.date?.formatted(.dateTime.month(.abbreviated).day()) ?? "TBD")
                 .font(.system(.caption2, weight: .bold))
-                .foregroundStyle(.white.opacity(0.4))
+                .foregroundStyle(.white.opacity(0.35))
         case .completed:
             Text("FINAL")
                 .font(.system(.caption2, weight: .bold))
@@ -191,133 +208,136 @@ struct FightDetailView: View {
         }
     }
 
-    // MARK: - Fighter Info Card
-
-    private var fighterInfoCard: some View {
-        HStack {
-            VStack(spacing: 2) {
-                Text(fight.fighterA.name)
-                    .font(.system(.subheadline, weight: .bold).width(.compressed))
-                    .foregroundStyle(.white)
-                Text(fight.fighterA.record)
-                    .font(.caption2)
-                    .foregroundStyle(.white.opacity(0.4))
-                if !fight.fighterA.nickname.isEmpty {
-                    Text("\"\(fight.fighterA.nickname)\"")
-                        .font(.system(.caption2, weight: .medium).italic())
-                        .foregroundStyle(RingsideTheme.gold.opacity(0.6))
-                }
-            }
-            .frame(maxWidth: .infinity)
-
-            VStack(spacing: 2) {
-                Text(fight.weightClass.rawValue.uppercased())
-                    .font(.system(.caption2, weight: .bold).width(.compressed))
-                    .foregroundStyle(RingsideTheme.gold.opacity(0.6))
-                Text("\(fight.scheduledRounds) ROUNDS")
-                    .font(.system(.caption2, weight: .semibold).width(.compressed))
-                    .foregroundStyle(.white.opacity(0.3))
-            }
-
-            VStack(spacing: 2) {
-                Text(fight.fighterB.name)
-                    .font(.system(.subheadline, weight: .bold).width(.compressed))
-                    .foregroundStyle(.white)
-                Text(fight.fighterB.record)
-                    .font(.caption2)
-                    .foregroundStyle(.white.opacity(0.4))
-                if !fight.fighterB.nickname.isEmpty {
-                    Text("\"\(fight.fighterB.nickname)\"")
-                        .font(.system(.caption2, weight: .medium).italic())
-                        .foregroundStyle(RingsideTheme.gold.opacity(0.6))
-                }
-            }
-            .frame(maxWidth: .infinity)
-        }
-        .padding(.vertical, 14)
-        .padding(.horizontal, 12)
-        .background(.ultraThinMaterial)
-        .clipShape(.rect(cornerRadius: 16, style: .continuous))
-        .overlay(
-            RoundedRectangle(cornerRadius: 16, style: .continuous)
-                .strokeBorder(
-                    LinearGradient(
-                        colors: [Color.white.opacity(0.12), Color.white.opacity(0.04)],
-                        startPoint: .top, endPoint: .bottom
-                    ),
-                    lineWidth: 0.5
-                )
-        )
-        .padding(.horizontal, 16)
-    }
-
     // MARK: - 1. Live Result Block
 
     private var liveResultBlock: some View {
-        VStack(spacing: 10) {
-            switch vm.phase {
-            case .pre:
-                preResultContent
-            case .live:
-                liveResultContent
-            case .post:
-                postResultContent
+        VStack(spacing: 0) {
+            sectionLabel(icon: "bolt.fill", title: phaseLabel)
+                .padding(.bottom, 12)
+
+            VStack(spacing: 10) {
+                switch vm.phase {
+                case .pre:
+                    preResultContent
+                case .live:
+                    liveResultContent
+                case .post:
+                    postResultContent
+                }
             }
+            .padding(16)
+            .frame(maxWidth: .infinity)
+            .background(
+                RoundedRectangle(cornerRadius: 18, style: .continuous)
+                    .fill(.ultraThinMaterial)
+            )
+            .clipShape(.rect(cornerRadius: 18, style: .continuous))
+            .overlay(
+                RoundedRectangle(cornerRadius: 18, style: .continuous)
+                    .strokeBorder(resultBorderGradient, lineWidth: 0.5)
+            )
+            .shadow(color: resultShadowColor, radius: 16, y: 6)
         }
-        .padding(16)
-        .glassCard()
-        .padding(.horizontal, 16)
+    }
+
+    private var phaseLabel: String {
+        switch vm.phase {
+        case .pre: return "UPCOMING"
+        case .live: return "LIVE STATUS"
+        case .post: return "RESULT"
+        }
+    }
+
+    private var resultBorderGradient: LinearGradient {
+        switch vm.phase {
+        case .live:
+            return LinearGradient(
+                colors: [RingsideTheme.liveRed.opacity(0.4), Color.white.opacity(0.08)],
+                startPoint: .topLeading, endPoint: .bottomTrailing
+            )
+        case .post:
+            return LinearGradient(
+                colors: [RingsideTheme.gold.opacity(0.3), Color.white.opacity(0.06)],
+                startPoint: .topLeading, endPoint: .bottomTrailing
+            )
+        default:
+            return LinearGradient(
+                colors: [Color.white.opacity(0.12), Color.white.opacity(0.04)],
+                startPoint: .topLeading, endPoint: .bottomTrailing
+            )
+        }
+    }
+
+    private var resultShadowColor: Color {
+        switch vm.phase {
+        case .live: return RingsideTheme.liveRed.opacity(0.1)
+        case .post: return RingsideTheme.gold.opacity(0.06)
+        default: return .black.opacity(0.15)
+        }
     }
 
     private var preResultContent: some View {
-        VStack(spacing: 10) {
-            HStack(spacing: 8) {
+        VStack(spacing: 12) {
+            HStack(spacing: 6) {
                 if let countdown = vm.countdownText {
-                    Text(countdown)
-                        .font(.system(.subheadline, weight: .semibold))
-                        .foregroundStyle(.white.opacity(0.8))
+                    HStack(spacing: 5) {
+                        Image(systemName: "clock.fill")
+                            .font(.system(size: 11))
+                            .foregroundStyle(RingsideTheme.gold.opacity(0.7))
+                        Text(countdown)
+                            .font(.system(.subheadline, weight: .semibold))
+                            .foregroundStyle(.white.opacity(0.8))
+                    }
                 }
-                Text("·")
-                    .foregroundStyle(.white.opacity(0.3))
-                Text("\(fight.scheduledRounds) rounds")
-                    .font(.system(.subheadline, weight: .medium))
-                    .foregroundStyle(.white.opacity(0.5))
                 if fight.isTitleFight {
                     Text("·")
-                        .foregroundStyle(.white.opacity(0.3))
-                    Text("Title fight")
-                        .font(.system(.subheadline, weight: .semibold))
-                        .foregroundStyle(RingsideTheme.gold)
+                        .foregroundStyle(.white.opacity(0.2))
+                    HStack(spacing: 4) {
+                        Image(systemName: "trophy.fill")
+                            .font(.system(size: 10))
+                        Text("Title Fight")
+                            .font(.system(.caption, weight: .bold))
+                    }
+                    .foregroundStyle(RingsideTheme.gold)
                 }
             }
 
             if vm.hasPredicted {
-                HStack(spacing: 6) {
+                HStack(spacing: 8) {
                     Image(systemName: "checkmark.seal.fill")
                         .foregroundStyle(.green)
-                        .font(.caption)
-                    Text("Prediction: \(vm.predictedWinner ?? "") · \(vm.predictedMethod?.rawValue ?? "") · Rds \(vm.predictedRoundRange ?? "")")
-                        .font(.system(.caption, weight: .medium))
-                        .foregroundStyle(.white.opacity(0.6))
+                        .font(.subheadline)
+                    VStack(alignment: .leading, spacing: 2) {
+                        Text("Your Prediction")
+                            .font(.system(.caption2, weight: .bold))
+                            .foregroundStyle(.green.opacity(0.7))
+                        Text("\(vm.predictedWinner ?? "") · \(vm.predictedMethod?.rawValue ?? "") · Rds \(vm.predictedRoundRange ?? "")")
+                            .font(.system(.caption, weight: .semibold))
+                            .foregroundStyle(.white.opacity(0.7))
+                    }
+                    Spacer()
                 }
-                .padding(.vertical, 8)
-                .padding(.horizontal, 12)
-                .background(Color.green.opacity(0.08))
-                .clipShape(.rect(cornerRadius: 10))
+                .padding(12)
+                .background(Color.green.opacity(0.06))
+                .clipShape(.rect(cornerRadius: 12))
+                .overlay(
+                    RoundedRectangle(cornerRadius: 12, style: .continuous)
+                        .strokeBorder(Color.green.opacity(0.15), lineWidth: 0.5)
+                )
             } else {
                 Button {
                     vm.showPredictionSheet = true
                 } label: {
-                    HStack(spacing: 6) {
+                    HStack(spacing: 8) {
                         Image(systemName: "chart.bar.fill")
                             .font(.caption)
-                        Text("PREDICT")
+                        Text("MAKE YOUR PREDICTION")
                             .font(.system(.caption, weight: .bold).width(.compressed))
                     }
                     .foregroundStyle(RingsideTheme.gold)
-                    .padding(.vertical, 10)
-                    .padding(.horizontal, 24)
-                    .background(RingsideTheme.gold.opacity(0.12))
+                    .frame(maxWidth: .infinity)
+                    .padding(.vertical, 12)
+                    .background(RingsideTheme.gold.opacity(0.1))
                     .clipShape(.rect(cornerRadius: 12))
                     .overlay(
                         RoundedRectangle(cornerRadius: 12, style: .continuous)
@@ -329,40 +349,41 @@ struct FightDetailView: View {
     }
 
     private var liveResultContent: some View {
-        VStack(spacing: 8) {
-            HStack(spacing: 8) {
+        VStack(spacing: 10) {
+            HStack(spacing: 10) {
                 LiveDot()
-                Text("RD \(fight.currentRound ?? 1) / \(fight.scheduledRounds)")
-                    .font(.system(.title3, weight: .heavy).width(.compressed))
+                Text("ROUND \(fight.currentRound ?? 1) OF \(fight.scheduledRounds)")
+                    .font(.system(.title3, weight: .black).width(.compressed))
                     .foregroundStyle(.white)
-                Text("· Live")
-                    .font(.system(.subheadline, weight: .bold))
-                    .foregroundStyle(RingsideTheme.liveRed)
             }
 
             if let score = vm.unofficialScore {
-                Text("Unofficial: \(score)")
-                    .font(.system(.caption, weight: .medium).italic())
-                    .foregroundStyle(.white.opacity(0.5))
+                HStack(spacing: 6) {
+                    Image(systemName: "person.crop.rectangle.stack")
+                        .font(.system(size: 10))
+                    Text("Unofficial: \(score)")
+                        .font(.system(.caption, weight: .medium).italic())
+                }
+                .foregroundStyle(.white.opacity(0.45))
+                .padding(.horizontal, 12)
+                .padding(.vertical, 6)
+                .background(Color.white.opacity(0.04))
+                .clipShape(.rect(cornerRadius: 8))
             }
         }
     }
 
     private var postResultContent: some View {
-        VStack(spacing: 6) {
+        VStack(spacing: 8) {
             if let result = fight.result {
-                Text("FINAL RESULT")
-                    .font(.system(.caption2, weight: .bold).width(.compressed))
-                    .foregroundStyle(.white.opacity(0.4))
-
                 Text(result.method)
-                    .font(.system(.title3, weight: .heavy))
+                    .font(.system(.title2, weight: .black).width(.compressed))
                     .foregroundStyle(.white)
 
                 if let scores = result.scores {
                     Text(scores)
                         .font(.system(.caption, weight: .medium))
-                        .foregroundStyle(.white.opacity(0.5))
+                        .foregroundStyle(.white.opacity(0.45))
                 }
 
                 if let winner = result.winnerName {
@@ -370,15 +391,22 @@ struct FightDetailView: View {
                         Image(systemName: "crown.fill")
                             .font(.caption)
                             .foregroundStyle(RingsideTheme.gold)
-                        Text("Winner: \(winner)")
+                        Text(winner)
                             .font(.system(.subheadline, weight: .bold))
                             .foregroundStyle(RingsideTheme.gold)
                     }
-                    .padding(.top, 2)
+                    .padding(.horizontal, 16)
+                    .padding(.vertical, 8)
+                    .background(RingsideTheme.gold.opacity(0.08))
+                    .clipShape(.rect(cornerRadius: 10))
+                    .overlay(
+                        RoundedRectangle(cornerRadius: 10, style: .continuous)
+                            .strokeBorder(RingsideTheme.gold.opacity(0.2), lineWidth: 0.5)
+                    )
                 }
             } else {
                 Text("FINAL")
-                    .font(.system(.title3, weight: .heavy))
+                    .font(.system(.title2, weight: .black))
                     .foregroundStyle(RingsideTheme.gold)
             }
         }
@@ -387,278 +415,324 @@ struct FightDetailView: View {
     // MARK: - 2. Overall Rating Block
 
     private var overallRatingBlock: some View {
-        VStack(spacing: 14) {
+        VStack(spacing: 0) {
             HStack {
-                Text("YOUR RATING")
-                    .font(.system(.caption, weight: .bold).width(.compressed))
-                    .foregroundStyle(.white.opacity(0.4))
+                sectionLabel(icon: "star.fill", title: "YOUR RATING")
                 Spacer()
                 if vm.phase == .live && !vm.hasRatedOverall {
                     Text("Set after the final bell")
                         .font(.system(.caption2, weight: .medium).italic())
-                        .foregroundStyle(.white.opacity(0.25))
+                        .foregroundStyle(.white.opacity(0.2))
+                }
+                if vm.hasRatedOverall {
+                    HStack(spacing: 4) {
+                        Image(systemName: "checkmark.circle.fill")
+                            .font(.caption2)
+                            .foregroundStyle(.green)
+                        Text("Rated")
+                            .font(.caption2)
+                            .foregroundStyle(.green.opacity(0.8))
+                    }
                 }
             }
+            .padding(.bottom, 12)
 
-            ratingNumberDisplay
-
-            tagChips
-
-            if vm.hasRatedOverall {
-                HStack(spacing: 4) {
-                    Image(systemName: "checkmark.circle.fill")
-                        .font(.caption2)
-                        .foregroundStyle(.green)
-                    Text("Rated \(String(format: "%.1f", vm.overallRating))/10")
-                        .font(.caption)
-                        .foregroundStyle(.green.opacity(0.8))
+            VStack(spacing: 16) {
+                if vm.overallRating > 0 {
+                    Text(String(format: "%.1f", vm.overallRating))
+                        .font(.system(size: 48, weight: .black, design: .rounded))
+                        .foregroundStyle(RingsideTheme.gold)
+                        .contentTransition(.numericText())
+                        .padding(.top, 4)
                 }
-                .transition(.opacity.combined(with: .scale(scale: 0.9)))
+
+                ratingButtons
+                ratingSlider
+                tagChips
             }
+            .padding(16)
+            .frame(maxWidth: .infinity)
+            .background(
+                RoundedRectangle(cornerRadius: 18, style: .continuous)
+                    .fill(.ultraThinMaterial)
+            )
+            .clipShape(.rect(cornerRadius: 18, style: .continuous))
+            .overlay(
+                RoundedRectangle(cornerRadius: 18, style: .continuous)
+                    .strokeBorder(
+                        LinearGradient(
+                            colors: [RingsideTheme.gold.opacity(0.25), RingsideTheme.gold.opacity(0.04)],
+                            startPoint: .topLeading, endPoint: .bottomTrailing
+                        ),
+                        lineWidth: 0.5
+                    )
+            )
+            .shadow(color: RingsideTheme.gold.opacity(0.06), radius: 14, y: 6)
+            .opacity(vm.phase == .live ? 0.7 : 1.0)
         }
-        .padding(16)
-        .glassGoldCard()
-        .opacity(vm.phase == .live ? 0.7 : 1.0)
-        .padding(.horizontal, 16)
     }
 
-    private var ratingNumberDisplay: some View {
-        VStack(spacing: 12) {
-            HStack(spacing: 12) {
-                ForEach([2.0, 4.0, 6.0, 8.0, 10.0], id: \.self) { value in
-                    Button {
-                        withAnimation(.bouncy) {
-                            vm.overallRating = vm.overallRating == value ? 0 : value
-                        }
-                    } label: {
-                        Text(String(format: "%.0f", value))
-                            .font(.system(.title3, weight: .heavy))
-                            .foregroundStyle(vm.overallRating >= value ? RingsideTheme.gold : .white.opacity(0.15))
-                            .frame(width: 48, height: 48)
-                            .background(
-                                vm.overallRating >= value
-                                    ? RingsideTheme.gold.opacity(0.15)
-                                    : Color.white.opacity(0.04)
-                            )
-                            .clipShape(Circle())
-                            .overlay(
-                                Circle()
-                                    .strokeBorder(
-                                        vm.overallRating >= value
-                                            ? RingsideTheme.gold.opacity(0.4)
-                                            : Color.white.opacity(0.06),
-                                        lineWidth: 1
-                                    )
-                            )
+    private var ratingButtons: some View {
+        HStack(spacing: 0) {
+            ForEach([2.0, 4.0, 6.0, 8.0, 10.0], id: \.self) { value in
+                Button {
+                    withAnimation(.bouncy) {
+                        vm.overallRating = vm.overallRating == value ? 0 : value
                     }
-                    .sensoryFeedback(.impact(weight: .light), trigger: vm.overallRating)
+                } label: {
+                    let isActive = vm.overallRating >= value
+                    Text(String(format: "%.0f", value))
+                        .font(.system(.subheadline, weight: .heavy))
+                        .foregroundStyle(isActive ? RingsideTheme.gold : .white.opacity(0.18))
+                        .frame(maxWidth: .infinity)
+                        .frame(height: 44)
+                        .background(isActive ? RingsideTheme.gold.opacity(0.12) : Color.white.opacity(0.03))
+                }
+                .sensoryFeedback(.impact(weight: .light), trigger: vm.overallRating)
+
+                if value < 10 {
+                    Rectangle()
+                        .fill(Color.white.opacity(0.04))
+                        .frame(width: 0.5)
                 }
             }
+        }
+        .clipShape(.rect(cornerRadius: 12))
+        .overlay(
+            RoundedRectangle(cornerRadius: 12, style: .continuous)
+                .strokeBorder(Color.white.opacity(0.06), lineWidth: 0.5)
+        )
+    }
 
+    private var ratingSlider: some View {
+        VStack(spacing: 4) {
             Slider(value: $vm.overallRating, in: 0...10, step: 0.1)
                 .tint(RingsideTheme.gold)
-                .padding(.horizontal, 4)
-
-            if vm.overallRating > 0 {
-                Text(String(format: "%.1f", vm.overallRating))
-                    .font(.system(size: 42, weight: .black, design: .rounded))
-                    .foregroundStyle(RingsideTheme.gold)
-                    .contentTransition(.numericText())
+            HStack {
+                Text("0")
+                Spacer()
+                Text("10")
             }
+            .font(.system(size: 9, weight: .medium))
+            .foregroundStyle(.white.opacity(0.15))
         }
     }
 
     private var tagChips: some View {
-        HStack(spacing: 8) {
-            ForEach(FightTag.allCases, id: \.rawValue) { tag in
-                Button {
-                    withAnimation(.snappy) {
-                        if vm.selectedTags.contains(tag) {
-                            vm.selectedTags.remove(tag)
-                        } else {
-                            vm.selectedTags.insert(tag)
+        ScrollView(.horizontal) {
+            HStack(spacing: 8) {
+                ForEach(FightTag.allCases, id: \.rawValue) { tag in
+                    Button {
+                        withAnimation(.snappy) {
+                            if vm.selectedTags.contains(tag) {
+                                vm.selectedTags.remove(tag)
+                            } else {
+                                vm.selectedTags.insert(tag)
+                            }
                         }
+                    } label: {
+                        let isActive = vm.selectedTags.contains(tag)
+                        Text(tag.rawValue)
+                            .font(.system(.caption2, weight: .bold))
+                            .foregroundStyle(isActive ? .black : .white.opacity(0.45))
+                            .padding(.horizontal, 14)
+                            .padding(.vertical, 7)
+                            .background(isActive ? RingsideTheme.gold : Color.white.opacity(0.05))
+                            .clipShape(Capsule())
+                            .overlay(
+                                Capsule()
+                                    .strokeBorder(isActive ? Color.clear : Color.white.opacity(0.06), lineWidth: 0.5)
+                            )
                     }
-                } label: {
-                    Text(tag.rawValue)
-                        .font(.system(.caption2, weight: .bold))
-                        .foregroundStyle(vm.selectedTags.contains(tag) ? .black : .white.opacity(0.5))
-                        .padding(.horizontal, 12)
-                        .padding(.vertical, 6)
-                        .background(
-                            vm.selectedTags.contains(tag)
-                                ? RingsideTheme.gold
-                                : Color.white.opacity(0.06)
-                        )
-                        .clipShape(Capsule())
                 }
             }
         }
+        .scrollIndicators(.hidden)
     }
 
     // MARK: - 3. Round-by-Round Strip
 
     private var roundByRoundStrip: some View {
-        VStack(spacing: 10) {
+        VStack(spacing: 0) {
             HStack {
-                Text("ROUND-BY-ROUND")
-                    .font(.system(.caption, weight: .bold).width(.compressed))
-                    .foregroundStyle(.white.opacity(0.4))
+                sectionLabel(icon: "list.number", title: "ROUND-BY-ROUND")
                 Spacer()
+                Text("\(vm.scoredRoundCount)/\(fight.scheduledRounds) scored")
+                    .font(.system(.caption2, weight: .medium))
+                    .foregroundStyle(.white.opacity(0.25))
             }
-            .padding(.horizontal, 16)
+            .padding(.bottom, 12)
 
-            ScrollView(.horizontal, showsIndicators: false) {
-                HStack(spacing: 8) {
-                    ForEach(1...fight.scheduledRounds, id: \.self) { round in
-                        let tappable = vm.isRoundTappable(round)
-                        let hasRating = vm.roundRatings[round] != nil
-                        let score = vm.roundRatings[round]?.score
-
-                        Button {
-                            guard tappable else { return }
-                            vm.openRoundRating(round)
-                        } label: {
-                            VStack(spacing: 4) {
-                                Text("R\(round)")
-                                    .font(.system(.caption2, weight: .bold))
-                                    .foregroundStyle(tappable ? .white : .white.opacity(0.2))
-
-                                if let s = score {
-                                    Text(String(format: "%.0f", s))
-                                        .font(.system(.caption, weight: .heavy))
-                                        .foregroundStyle(RingsideTheme.gold)
-                                } else {
-                                    Text("–")
-                                        .font(.system(.caption, weight: .medium))
-                                        .foregroundStyle(.white.opacity(0.15))
-                                }
-
-                                if hasRating {
-                                    Circle()
-                                        .fill(RingsideTheme.gold)
-                                        .frame(width: 4, height: 4)
-                                } else if tappable {
-                                    Image(systemName: "pencil")
-                                        .font(.system(size: 8))
-                                        .foregroundStyle(.white.opacity(0.25))
-                                }
-                            }
-                            .frame(width: 44, height: 60)
-                            .background(
-                                hasRating
-                                    ? RingsideTheme.gold.opacity(0.1)
-                                    : Color.white.opacity(tappable ? 0.04 : 0.02)
-                            )
-                            .clipShape(.rect(cornerRadius: 10))
-                            .overlay(
-                                RoundedRectangle(cornerRadius: 10, style: .continuous)
-                                    .strokeBorder(
-                                        hasRating
-                                            ? RingsideTheme.gold.opacity(0.3)
-                                            : Color.white.opacity(0.06),
-                                        lineWidth: 0.5
-                                    )
-                            )
+            VStack(spacing: 14) {
+                ScrollView(.horizontal, showsIndicators: false) {
+                    HStack(spacing: 6) {
+                        ForEach(1...fight.scheduledRounds, id: \.self) { round in
+                            roundPill(round)
                         }
-                        .disabled(!tappable)
                     }
                 }
-                .padding(.horizontal, 16)
-            }
-            .contentMargins(.horizontal, 0)
+                .contentMargins(.horizontal, 0)
 
-            Button {
-                if vm.scoredRoundCount > 0 {
-                    let nextUnscoredRound = (1...fight.scheduledRounds).first { vm.roundRatings[$0] == nil && vm.isRoundTappable($0) }
-                    if let round = nextUnscoredRound {
-                        vm.openRoundRating(round)
+                Button {
+                    if vm.scoredRoundCount > 0 {
+                        let nextUnscoredRound = (1...fight.scheduledRounds).first { vm.roundRatings[$0] == nil && vm.isRoundTappable($0) }
+                        if let round = nextUnscoredRound {
+                            vm.openRoundRating(round)
+                        }
                     }
-                }
-            } label: {
-                Text(vm.cardButtonLabel.uppercased())
-                    .font(.system(.caption, weight: .bold).width(.compressed))
+                } label: {
+                    HStack(spacing: 6) {
+                        Image(systemName: vm.canSaveCard ? "checkmark.circle.fill" : "pencil.circle.fill")
+                            .font(.caption)
+                        Text(vm.cardButtonLabel.uppercased())
+                            .font(.system(.caption, weight: .bold).width(.compressed))
+                    }
                     .foregroundStyle(vm.canSaveCard ? .black : RingsideTheme.gold)
-                    .padding(.vertical, 8)
-                    .padding(.horizontal, 20)
-                    .background(vm.canSaveCard ? RingsideTheme.gold : RingsideTheme.gold.opacity(0.12))
-                    .clipShape(.rect(cornerRadius: 10))
+                    .frame(maxWidth: .infinity)
+                    .frame(height: 40)
+                    .background(vm.canSaveCard ? RingsideTheme.gold : RingsideTheme.gold.opacity(0.1))
+                    .clipShape(.rect(cornerRadius: 12))
+                    .overlay(
+                        RoundedRectangle(cornerRadius: 12, style: .continuous)
+                            .strokeBorder(
+                                vm.canSaveCard ? Color.clear : RingsideTheme.gold.opacity(0.2),
+                                lineWidth: 0.5
+                            )
+                    )
+                }
             }
-            .padding(.horizontal, 16)
+            .padding(16)
+            .frame(maxWidth: .infinity)
+            .background(
+                RoundedRectangle(cornerRadius: 18, style: .continuous)
+                    .fill(.ultraThinMaterial)
+            )
+            .clipShape(.rect(cornerRadius: 18, style: .continuous))
+            .overlay(
+                RoundedRectangle(cornerRadius: 18, style: .continuous)
+                    .strokeBorder(
+                        LinearGradient(
+                            colors: [Color.white.opacity(0.1), Color.white.opacity(0.03)],
+                            startPoint: .topLeading, endPoint: .bottomTrailing
+                        ),
+                        lineWidth: 0.5
+                    )
+            )
+            .shadow(color: .black.opacity(0.15), radius: 12, y: 6)
         }
+    }
+
+    private func roundPill(_ round: Int) -> some View {
+        let tappable = vm.isRoundTappable(round)
+        let hasRating = vm.roundRatings[round] != nil
+        let score = vm.roundRatings[round]?.score
+
+        return Button {
+            guard tappable else { return }
+            vm.openRoundRating(round)
+        } label: {
+            VStack(spacing: 3) {
+                Text("R\(round)")
+                    .font(.system(size: 10, weight: .bold))
+                    .foregroundStyle(tappable ? .white.opacity(0.7) : .white.opacity(0.15))
+
+                if let s = score {
+                    Text(String(format: "%.0f", s))
+                        .font(.system(.caption, weight: .black))
+                        .foregroundStyle(RingsideTheme.gold)
+                } else {
+                    Text("–")
+                        .font(.system(.caption, weight: .medium))
+                        .foregroundStyle(.white.opacity(0.12))
+                }
+            }
+            .frame(width: 42, height: 50)
+            .background(
+                hasRating
+                    ? RingsideTheme.gold.opacity(0.1)
+                    : Color.white.opacity(tappable ? 0.04 : 0.015)
+            )
+            .clipShape(.rect(cornerRadius: 10))
+            .overlay(
+                RoundedRectangle(cornerRadius: 10, style: .continuous)
+                    .strokeBorder(
+                        hasRating
+                            ? RingsideTheme.gold.opacity(0.3)
+                            : Color.white.opacity(tappable ? 0.06 : 0.02),
+                        lineWidth: 0.5
+                    )
+            )
+        }
+        .disabled(!tappable)
     }
 
     // MARK: - 4. Actions Row
 
     private var actionsRow: some View {
         HStack(spacing: 10) {
-            Button {
+            actionButton(
+                icon: vm.isFavorite ? "star.fill" : "star",
+                activeColor: vm.isFavorite ? RingsideTheme.gold : nil
+            ) {
                 withAnimation(.bouncy) { vm.isFavorite.toggle() }
-            } label: {
-                Image(systemName: vm.isFavorite ? "star.fill" : "star")
-                    .font(.subheadline.weight(.medium))
-                    .foregroundStyle(vm.isFavorite ? RingsideTheme.gold : .white.opacity(0.5))
-                    .frame(width: 44, height: 40)
-                    .background(.ultraThinMaterial)
-                    .clipShape(.rect(cornerRadius: 12, style: .continuous))
-                    .overlay(
-                        RoundedRectangle(cornerRadius: 12, style: .continuous)
-                            .strokeBorder(
-                                vm.isFavorite ? RingsideTheme.gold.opacity(0.3) : Color.white.opacity(0.08),
-                                lineWidth: 0.5
-                            )
-                    )
             }
             .sensoryFeedback(.impact(weight: .medium), trigger: vm.isFavorite)
 
-            Button { } label: {
-                Image(systemName: "square.and.arrow.up")
-                    .font(.subheadline.weight(.medium))
-                    .foregroundStyle(.white.opacity(0.5))
-                    .frame(width: 44, height: 40)
-                    .background(.ultraThinMaterial)
-                    .clipShape(.rect(cornerRadius: 12, style: .continuous))
-                    .overlay(
-                        RoundedRectangle(cornerRadius: 12, style: .continuous)
-                            .strokeBorder(Color.white.opacity(0.08), lineWidth: 0.5)
-                    )
-            }
+            actionButton(icon: "square.and.arrow.up", activeColor: nil) { }
 
             Button {
                 withAnimation(.bouncy) { vm.isAddedToLog.toggle() }
             } label: {
                 HStack(spacing: 6) {
                     Image(systemName: vm.isAddedToLog ? "checkmark" : "plus")
-                        .font(.caption)
+                        .font(.system(.caption, weight: .semibold))
                     Text(vm.isAddedToLog ? "IN LOG" : "ADD TO LOG")
                         .font(.system(.caption, weight: .bold).width(.compressed))
                 }
-                .foregroundStyle(vm.isAddedToLog ? .black : .white.opacity(0.7))
+                .foregroundStyle(vm.isAddedToLog ? .black : .white.opacity(0.6))
                 .frame(maxWidth: .infinity)
-                .frame(height: 40)
-                .background(vm.isAddedToLog ? RingsideTheme.gold : Color.white.opacity(0.06))
+                .frame(height: 44)
+                .background(vm.isAddedToLog ? RingsideTheme.gold : Color.white.opacity(0.05))
                 .clipShape(.rect(cornerRadius: 12, style: .continuous))
                 .overlay(
                     RoundedRectangle(cornerRadius: 12, style: .continuous)
                         .strokeBorder(
-                            vm.isAddedToLog ? RingsideTheme.gold.opacity(0.4) : Color.white.opacity(0.08),
+                            vm.isAddedToLog ? Color.clear : Color.white.opacity(0.06),
                             lineWidth: 0.5
                         )
                 )
             }
             .sensoryFeedback(.impact(weight: .light), trigger: vm.isAddedToLog)
         }
-        .padding(.horizontal, 16)
+    }
+
+    private func actionButton(icon: String, activeColor: Color?, action: @escaping () -> Void) -> some View {
+        Button(action: action) {
+            Image(systemName: icon)
+                .font(.subheadline.weight(.medium))
+                .foregroundStyle(activeColor ?? .white.opacity(0.5))
+                .frame(width: 44, height: 44)
+                .background(Color.white.opacity(0.05))
+                .clipShape(.rect(cornerRadius: 12, style: .continuous))
+                .overlay(
+                    RoundedRectangle(cornerRadius: 12, style: .continuous)
+                        .strokeBorder(
+                            activeColor != nil ? activeColor!.opacity(0.3) : Color.white.opacity(0.06),
+                            lineWidth: 0.5
+                        )
+                )
+        }
     }
 
     // MARK: - 5. Discussion Carousel
 
     private var discussionCarousel: some View {
-        VStack(spacing: 10) {
-            HStack {
-                Text(vm.carouselLabel)
-                    .font(.system(.caption, weight: .bold).width(.compressed))
-                    .foregroundStyle(.white.opacity(0.4))
+        VStack(spacing: 0) {
+            HStack(alignment: .center) {
+                sectionLabel(
+                    icon: vm.phase == .pre ? "megaphone.fill" : "bubble.left.and.bubble.right.fill",
+                    title: vm.carouselLabel
+                )
                 Spacer()
                 Button {
                     vm.showDiscussionModal = true
@@ -667,23 +741,22 @@ struct FightDetailView: View {
                         Text("View All")
                             .font(.system(.caption2, weight: .semibold))
                         Image(systemName: "chevron.right")
-                            .font(.system(size: 9, weight: .bold))
+                            .font(.system(size: 8, weight: .bold))
                     }
-                    .foregroundStyle(RingsideTheme.gold.opacity(0.7))
+                    .foregroundStyle(RingsideTheme.gold.opacity(0.6))
                 }
             }
-            .padding(.horizontal, 16)
+            .padding(.bottom, 12)
 
             if !vm.carouselComments.isEmpty {
                 TabView(selection: $vm.carouselIndex) {
                     ForEach(Array(vm.carouselComments.enumerated()), id: \.element.id) { index, comment in
-                        discussionCarouselCard(comment)
+                        carouselCard(comment)
                             .tag(index)
-                            .padding(.horizontal, 16)
                     }
                 }
                 .tabViewStyle(.page(indexDisplayMode: .automatic))
-                .frame(height: 130)
+                .frame(height: 120)
                 .onAppear { startCarouselTimer() }
                 .gesture(
                     DragGesture(minimumDistance: 5)
@@ -695,63 +768,76 @@ struct FightDetailView: View {
                             }
                         }
                 )
+            } else {
+                HStack {
+                    Spacer()
+                    VStack(spacing: 6) {
+                        Image(systemName: "bubble.left.and.text.bubble.right")
+                            .font(.title3)
+                            .foregroundStyle(.white.opacity(0.15))
+                        Text("No comments yet")
+                            .font(.caption)
+                            .foregroundStyle(.white.opacity(0.2))
+                    }
+                    .padding(.vertical, 24)
+                    Spacer()
+                }
             }
         }
     }
 
-    private func discussionCarouselCard(_ comment: DiscussionComment) -> some View {
+    private func carouselCard(_ comment: DiscussionComment) -> some View {
         Button {
             vm.showDiscussionModal = true
         } label: {
             VStack(alignment: .leading, spacing: 8) {
-                HStack {
+                HStack(spacing: 6) {
+                    Circle()
+                        .fill(RingsideTheme.gold.opacity(0.2))
+                        .frame(width: 24, height: 24)
+                        .overlay {
+                            Text(String(comment.userName.prefix(1)))
+                                .font(.system(size: 10, weight: .bold))
+                                .foregroundStyle(RingsideTheme.gold)
+                        }
                     Text(comment.userName)
                         .font(.system(.caption, weight: .bold))
                         .foregroundStyle(RingsideTheme.gold)
+                    if comment.isPrediction {
+                        Text("PREDICTION")
+                            .font(.system(size: 8, weight: .bold))
+                            .foregroundStyle(RingsideTheme.gold.opacity(0.8))
+                            .padding(.horizontal, 5)
+                            .padding(.vertical, 2)
+                            .background(RingsideTheme.gold.opacity(0.12))
+                            .clipShape(Capsule())
+                    }
                     Spacer()
                     Text(comment.timestamp, format: .dateTime.hour().minute())
-                        .font(.system(size: 10))
-                        .foregroundStyle(.white.opacity(0.25))
+                        .font(.system(size: 9))
+                        .foregroundStyle(.white.opacity(0.2))
                 }
 
                 Text(comment.text)
                     .font(.system(.subheadline, weight: .medium))
-                    .foregroundStyle(.white.opacity(0.85))
+                    .foregroundStyle(.white.opacity(0.8))
                     .lineLimit(2)
                     .multilineTextAlignment(.leading)
 
-                HStack(spacing: 16) {
-                    HStack(spacing: 4) {
-                        Image(systemName: "hand.thumbsup")
-                            .font(.system(size: 10))
-                        Text("\(comment.thumbsUp)")
-                            .font(.system(size: 10, weight: .medium))
-                    }
-                    .foregroundStyle(.white.opacity(0.35))
-
-                    HStack(spacing: 4) {
-                        Image(systemName: "hand.thumbsdown")
-                            .font(.system(size: 10))
-                        Text("\(comment.thumbsDown)")
-                            .font(.system(size: 10, weight: .medium))
-                    }
-                    .foregroundStyle(.white.opacity(0.35))
-
-                    HStack(spacing: 4) {
-                        Image(systemName: "arrowshape.turn.up.left")
-                            .font(.system(size: 10))
-                        Text("Reply")
-                            .font(.system(size: 10, weight: .medium))
-                    }
-                    .foregroundStyle(.white.opacity(0.35))
+                HStack(spacing: 14) {
+                    Label("\(comment.thumbsUp)", systemImage: "hand.thumbsup")
+                    Label("\(comment.thumbsDown)", systemImage: "hand.thumbsdown")
+                    Label("Reply", systemImage: "arrowshape.turn.up.left")
                 }
+                .font(.system(size: 10, weight: .medium))
+                .foregroundStyle(.white.opacity(0.25))
             }
             .padding(14)
             .background(.ultraThinMaterial)
             .clipShape(.rect(cornerRadius: 14, style: .continuous))
             .overlay(
                 RoundedRectangle(cornerRadius: 14, style: .continuous)
-                    .strokeBorder(Color.white.opacity(0.08), lineWidth: 0.5)
+                    .strokeBorder(Color.white.opacity(0.06), lineWidth: 0.5)
             )
         }
     }
@@ -768,13 +854,31 @@ struct FightDetailView: View {
         }
     }
 
+    // MARK: - Section Label Helper
+
+    private func sectionLabel(icon: String, title: String) -> some View {
+        HStack(spacing: 6) {
+            Image(systemName: icon)
+                .font(.system(size: 10, weight: .semibold))
+                .foregroundStyle(RingsideTheme.gold.opacity(0.7))
+            Text(title)
+                .font(.system(.caption, weight: .heavy).width(.compressed))
+                .foregroundStyle(.white.opacity(0.4))
+        }
+    }
+
     // MARK: - Round Rating Sheet
 
     private var roundRatingSheet: some View {
-        VStack(spacing: 20) {
-            Text("ROUND \(vm.activeRoundForRating)")
-                .font(.system(.title2, weight: .black).width(.compressed))
-                .foregroundStyle(.primary)
+        VStack(spacing: 24) {
+            VStack(spacing: 4) {
+                Text("ROUND \(vm.activeRoundForRating)")
+                    .font(.system(.title2, weight: .black).width(.compressed))
+                    .foregroundStyle(.primary)
+                Text("Score this round")
+                    .font(.caption)
+                    .foregroundStyle(.secondary)
+            }
 
             VStack(spacing: 8) {
                 Text(String(format: "%.1f", vm.roundRatingDraft))
@@ -786,31 +890,34 @@ struct FightDetailView: View {
                     .tint(RingsideTheme.gold)
             }
 
-            HStack(spacing: 8) {
-                ForEach(RoundTag.allCases, id: \.rawValue) { tag in
-                    Button {
-                        withAnimation(.snappy) {
-                            if vm.roundTagsDraft.contains(tag) {
-                                vm.roundTagsDraft.remove(tag)
-                            } else {
-                                vm.roundTagsDraft.insert(tag)
+            ScrollView(.horizontal) {
+                HStack(spacing: 8) {
+                    ForEach(RoundTag.allCases, id: \.rawValue) { tag in
+                        Button {
+                            withAnimation(.snappy) {
+                                if vm.roundTagsDraft.contains(tag) {
+                                    vm.roundTagsDraft.remove(tag)
+                                } else {
+                                    vm.roundTagsDraft.insert(tag)
+                                }
                             }
+                        } label: {
+                            Text(tag.rawValue)
+                                .font(.system(.caption, weight: .bold))
+                                .foregroundStyle(vm.roundTagsDraft.contains(tag) ? .black : .secondary)
+                                .padding(.horizontal, 14)
+                                .padding(.vertical, 8)
+                                .background(
+                                    vm.roundTagsDraft.contains(tag)
+                                        ? RingsideTheme.gold
+                                        : Color(.tertiarySystemFill)
+                                )
+                                .clipShape(Capsule())
                         }
-                    } label: {
-                        Text(tag.rawValue)
-                            .font(.system(.caption, weight: .bold))
-                            .foregroundStyle(vm.roundTagsDraft.contains(tag) ? .black : .secondary)
-                            .padding(.horizontal, 14)
-                            .padding(.vertical, 8)
-                            .background(
-                                vm.roundTagsDraft.contains(tag)
-                                    ? RingsideTheme.gold
-                                    : Color(.tertiarySystemFill)
-                            )
-                            .clipShape(Capsule())
                     }
                 }
             }
+            .scrollIndicators(.hidden)
 
             Button {
                 vm.saveRoundRating()
@@ -830,16 +937,20 @@ struct FightDetailView: View {
     // MARK: - Prediction Sheet
 
     private var predictionSheet: some View {
-        VStack(spacing: 20) {
-            Text("YOUR PREDICTION")
-                .font(.system(.title2, weight: .black).width(.compressed))
-                .foregroundStyle(.primary)
+        VStack(spacing: 24) {
+            VStack(spacing: 4) {
+                Text("YOUR PREDICTION")
+                    .font(.system(.title2, weight: .black).width(.compressed))
+                    .foregroundStyle(.primary)
+                Text("Who wins and how?")
+                    .font(.caption)
+                    .foregroundStyle(.secondary)
+            }
 
-            VStack(alignment: .leading, spacing: 12) {
+            VStack(alignment: .leading, spacing: 8) {
                 Text("Winner")
                     .font(.system(.caption, weight: .bold))
                     .foregroundStyle(.secondary)
-
                 Picker("Winner", selection: $vm.predictionWinnerDraft) {
                     Text(fight.fighterA.name).tag(fight.fighterA.name)
                     Text(fight.fighterB.name).tag(fight.fighterB.name)
@@ -847,11 +958,10 @@ struct FightDetailView: View {
                 .pickerStyle(.segmented)
             }
 
-            VStack(alignment: .leading, spacing: 12) {
+            VStack(alignment: .leading, spacing: 8) {
                 Text("Method")
                     .font(.system(.caption, weight: .bold))
                     .foregroundStyle(.secondary)
-
                 Picker("Method", selection: $vm.predictionMethodDraft) {
                     ForEach(PredictionMethod.allCases, id: \.rawValue) { method in
                         Text(method.rawValue).tag(method)
@@ -860,11 +970,10 @@ struct FightDetailView: View {
                 .pickerStyle(.segmented)
             }
 
-            VStack(alignment: .leading, spacing: 12) {
+            VStack(alignment: .leading, spacing: 8) {
                 Text("Round Range")
                     .font(.system(.caption, weight: .bold))
                     .foregroundStyle(.secondary)
-
                 Picker("Rounds", selection: $vm.predictionRoundDraft) {
                     Text("1–3").tag("1-3")
                     Text("4–6").tag("4-6")
@@ -959,23 +1068,35 @@ struct FightDetailView: View {
 
     private func discussionCommentRow(_ comment: DiscussionComment) -> some View {
         VStack(alignment: .leading, spacing: 8) {
-            HStack {
-                Text(comment.userName)
-                    .font(.system(.subheadline, weight: .bold))
-                    .foregroundStyle(.primary)
-                if comment.isPrediction {
-                    Text("PREDICTION")
-                        .font(.system(size: 9, weight: .bold))
-                        .foregroundStyle(RingsideTheme.gold)
-                        .padding(.horizontal, 6)
-                        .padding(.vertical, 2)
-                        .background(RingsideTheme.gold.opacity(0.15))
-                        .clipShape(Capsule())
+            HStack(spacing: 8) {
+                Circle()
+                    .fill(RingsideTheme.gold.opacity(0.15))
+                    .frame(width: 28, height: 28)
+                    .overlay {
+                        Text(String(comment.userName.prefix(1)))
+                            .font(.system(size: 11, weight: .bold))
+                            .foregroundStyle(RingsideTheme.gold)
+                    }
+                VStack(alignment: .leading, spacing: 1) {
+                    HStack(spacing: 6) {
+                        Text(comment.userName)
+                            .font(.system(.subheadline, weight: .bold))
+                            .foregroundStyle(.primary)
+                        if comment.isPrediction {
+                            Text("PREDICTION")
+                                .font(.system(size: 9, weight: .bold))
+                                .foregroundStyle(RingsideTheme.gold)
+                                .padding(.horizontal, 6)
+                                .padding(.vertical, 2)
+                                .background(RingsideTheme.gold.opacity(0.15))
+                                .clipShape(Capsule())
+                        }
+                    }
+                    Text(comment.timestamp, format: .dateTime.hour().minute())
+                        .font(.caption2)
+                        .foregroundStyle(.secondary)
                 }
                 Spacer()
-                Text(comment.timestamp, format: .dateTime.hour().minute())
-                    .font(.caption2)
-                    .foregroundStyle(.secondary)
             }
 
             Text(comment.text)
