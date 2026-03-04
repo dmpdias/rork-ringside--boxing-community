@@ -71,19 +71,25 @@ struct HomeView: View {
     }
 
     private var headerSection: some View {
-        Text("FIGHT NIGHT")
-            .font(.system(size: 38, weight: .black, design: .default).width(.compressed))
-            .foregroundStyle(
-                LinearGradient(
-                    colors: [.white, RingsideTheme.gold.opacity(0.9)],
-                    startPoint: .leading,
-                    endPoint: .trailing
+        HStack(alignment: .bottom, spacing: 10) {
+            Text("FIGHT NIGHT")
+                .font(.system(size: 38, weight: .black, design: .default).width(.compressed))
+                .foregroundStyle(
+                    LinearGradient(
+                        colors: [.white, RingsideTheme.gold.opacity(0.9)],
+                        startPoint: .leading,
+                        endPoint: .trailing
+                    )
                 )
-            )
-            .padding(.horizontal)
-            .padding(.top, 8)
-            .opacity(appearAnimation ? 1 : 0)
-            .offset(y: appearAnimation ? 0 : 10)
+            Image(systemName: "figure.boxing")
+                .font(.system(size: 22, weight: .bold))
+                .foregroundStyle(RingsideTheme.gloveRed)
+                .offset(y: -4)
+        }
+        .padding(.horizontal)
+        .padding(.top, 8)
+        .opacity(appearAnimation ? 1 : 0)
+        .offset(y: appearAnimation ? 0 : 10)
     }
 
     private var dateNavigator: some View {
@@ -99,7 +105,7 @@ struct HomeView: View {
                     .frame(width: 48, height: 48)
                     .background(
                         Circle()
-                            .fill(.white.opacity(0.04))
+                            .fill(RingsideTheme.charcoalLight.opacity(0.6))
                     )
             }
 
@@ -137,7 +143,7 @@ struct HomeView: View {
                     .frame(width: 48, height: 48)
                     .background(
                         Circle()
-                            .fill(.white.opacity(0.04))
+                            .fill(RingsideTheme.charcoalLight.opacity(0.6))
                     )
             }
         }
@@ -146,7 +152,9 @@ struct HomeView: View {
         .background {
             ZStack {
                 RoundedRectangle(cornerRadius: 22, style: .continuous)
-                    .fill(.ultraThinMaterial)
+                    .fill(RingsideTheme.charcoal)
+                RoundedRectangle(cornerRadius: 22, style: .continuous)
+                    .fill(.ultraThinMaterial.opacity(0.4))
                 RoundedRectangle(cornerRadius: 22, style: .continuous)
                     .fill(
                         LinearGradient(
@@ -163,9 +171,9 @@ struct HomeView: View {
                 .strokeBorder(
                     LinearGradient(
                         colors: [
-                            RingsideTheme.gold.opacity(0.35),
-                            Color.white.opacity(0.12),
-                            RingsideTheme.gold.opacity(0.08)
+                            RingsideTheme.gold.opacity(0.5),
+                            RingsideTheme.gold.opacity(0.15),
+                            RingsideTheme.gold.opacity(0.35)
                         ],
                         startPoint: .topLeading,
                         endPoint: .bottomTrailing
@@ -173,7 +181,7 @@ struct HomeView: View {
                     lineWidth: 0.75
                 )
         )
-        .shadow(color: RingsideTheme.gold.opacity(0.06), radius: 12, y: 4)
+        .shadow(color: RingsideTheme.gold.opacity(0.08), radius: 14, y: 5)
         .padding(.horizontal)
         .sensoryFeedback(.selection, trigger: selectedDate)
     }
@@ -187,17 +195,17 @@ struct HomeView: View {
                         Text("LIVE NOW")
                             .font(.system(.caption, weight: .heavy).width(.compressed))
                             .tracking(1)
-                            .foregroundStyle(RingsideTheme.liveRed)
+                            .foregroundStyle(RingsideTheme.gloveRed)
                     }
                     .padding(.horizontal, 10)
                     .padding(.vertical, 5)
                     .background(
                         Capsule(style: .continuous)
-                            .fill(RingsideTheme.liveRed.opacity(0.12))
+                            .fill(RingsideTheme.gloveRed.opacity(0.15))
                     )
                     .overlay(
                         Capsule(style: .continuous)
-                            .strokeBorder(RingsideTheme.liveRed.opacity(0.25), lineWidth: 0.5)
+                            .strokeBorder(RingsideTheme.gloveRed.opacity(0.35), lineWidth: 0.75)
                     )
 
                     Spacer()
@@ -208,12 +216,12 @@ struct HomeView: View {
                         Text("\(fight.viewerCount ?? 0, format: .number)")
                             .font(.system(.caption2, weight: .bold))
                     }
-                    .foregroundStyle(.white.opacity(0.45))
+                    .foregroundStyle(.white.opacity(0.5))
                     .padding(.horizontal, 10)
                     .padding(.vertical, 5)
                     .background(
                         Capsule(style: .continuous)
-                            .fill(.white.opacity(0.05))
+                            .fill(RingsideTheme.charcoalLight.opacity(0.8))
                     )
                 }
                 .padding(.horizontal, 18)
@@ -227,26 +235,26 @@ struct HomeView: View {
                                 Circle()
                                     .fill(
                                         RadialGradient(
-                                            colors: [RingsideTheme.liveRed.opacity(0.15), .clear],
+                                            colors: [RingsideTheme.gloveRed.opacity(0.25), RingsideTheme.gloveRed.opacity(0.05), .clear],
                                             center: .center,
-                                            startRadius: 20,
+                                            startRadius: 10,
                                             endRadius: 44
                                         )
                                     )
-                                    .frame(width: 72, height: 72)
+                                    .frame(width: 76, height: 76)
                                 FighterAvatar(imageURL: fight.fighterA.imageURL, size: 58)
                                     .overlay(
                                         Circle()
                                             .strokeBorder(
                                                 LinearGradient(
-                                                    colors: [.white.opacity(0.25), .white.opacity(0.05)],
+                                                    colors: [RingsideTheme.gloveRed.opacity(0.6), RingsideTheme.gold.opacity(0.3)],
                                                     startPoint: .topLeading,
                                                     endPoint: .bottomTrailing
                                                 ),
                                                 lineWidth: 1.5
                                             )
                                     )
-                                    .shadow(color: .black.opacity(0.4), radius: 8, y: 4)
+                                    .shadow(color: RingsideTheme.gloveRed.opacity(0.3), radius: 10, y: 4)
                             }
                             Text(fight.fighterA.name.components(separatedBy: " ").last ?? "")
                                 .font(.system(.title2, weight: .heavy).width(.compressed))
@@ -281,26 +289,26 @@ struct HomeView: View {
                                 Circle()
                                     .fill(
                                         RadialGradient(
-                                            colors: [RingsideTheme.gold.opacity(0.1), .clear],
+                                            colors: [RingsideTheme.gold.opacity(0.15), RingsideTheme.gold.opacity(0.03), .clear],
                                             center: .center,
-                                            startRadius: 20,
+                                            startRadius: 10,
                                             endRadius: 44
                                         )
                                     )
-                                    .frame(width: 72, height: 72)
+                                    .frame(width: 76, height: 76)
                                 FighterAvatar(imageURL: fight.fighterB.imageURL, size: 58)
                                     .overlay(
                                         Circle()
                                             .strokeBorder(
                                                 LinearGradient(
-                                                    colors: [.white.opacity(0.25), .white.opacity(0.05)],
+                                                    colors: [RingsideTheme.gold.opacity(0.5), RingsideTheme.gold.opacity(0.15)],
                                                     startPoint: .topLeading,
                                                     endPoint: .bottomTrailing
                                                 ),
                                                 lineWidth: 1.5
                                             )
                                     )
-                                    .shadow(color: .black.opacity(0.4), radius: 8, y: 4)
+                                    .shadow(color: RingsideTheme.gold.opacity(0.2), radius: 10, y: 4)
                             }
                             Text(fight.fighterB.name.components(separatedBy: " ").last ?? "")
                                 .font(.system(.title2, weight: .heavy).width(.compressed))
@@ -323,22 +331,25 @@ struct HomeView: View {
             .background {
                 ZStack {
                     RoundedRectangle(cornerRadius: 24, style: .continuous)
-                        .fill(.thickMaterial)
+                        .fill(RingsideTheme.charcoalDark)
+
+                    RoundedRectangle(cornerRadius: 24, style: .continuous)
+                        .fill(.thickMaterial.opacity(0.4))
 
                     RoundedRectangle(cornerRadius: 24, style: .continuous)
                         .fill(
                             RadialGradient(
-                                colors: [RingsideTheme.liveRed.opacity(0.18), .clear],
+                                colors: [RingsideTheme.gloveRed.opacity(0.22), RingsideTheme.gloveRed.opacity(0.05), .clear],
                                 center: .topLeading,
                                 startRadius: 0,
-                                endRadius: 280
+                                endRadius: 300
                             )
                         )
 
                     RoundedRectangle(cornerRadius: 24, style: .continuous)
                         .fill(
                             LinearGradient(
-                                colors: [RingsideTheme.gold.opacity(0.05), .clear, RingsideTheme.liveRed.opacity(0.03)],
+                                colors: [RingsideTheme.gold.opacity(0.05), .clear, RingsideTheme.gloveRed.opacity(0.04)],
                                 startPoint: .bottomTrailing,
                                 endPoint: .topLeading
                             )
@@ -351,19 +362,19 @@ struct HomeView: View {
                     .strokeBorder(
                         LinearGradient(
                             colors: [
-                                RingsideTheme.liveRed.opacity(0.5),
+                                RingsideTheme.gloveRed.opacity(0.6),
+                                RingsideTheme.gold.opacity(0.35),
                                 RingsideTheme.gold.opacity(0.2),
-                                Color.white.opacity(0.1),
-                                RingsideTheme.liveRed.opacity(0.15)
+                                RingsideTheme.gloveRed.opacity(0.25)
                             ],
                             startPoint: .topLeading,
                             endPoint: .bottomTrailing
                         ),
-                        lineWidth: 0.75
+                        lineWidth: 1
                     )
             )
-            .shadow(color: RingsideTheme.liveRed.opacity(0.15), radius: 24, y: 10)
-            .shadow(color: RingsideTheme.gold.opacity(0.05), radius: 12, y: 4)
+            .shadow(color: RingsideTheme.gloveRed.opacity(0.2), radius: 28, y: 12)
+            .shadow(color: RingsideTheme.gold.opacity(0.06), radius: 14, y: 5)
         }
         .buttonStyle(.plain)
         .padding(.horizontal)
@@ -376,7 +387,7 @@ struct HomeView: View {
             HStack(spacing: 6) {
                 Image(systemName: "flame.fill")
                     .font(.caption)
-                    .foregroundStyle(RingsideTheme.gold)
+                    .foregroundStyle(RingsideTheme.gloveRed)
                 Text("HIGHLIGHT OF THE DAY")
                     .font(.system(.caption, weight: .heavy).width(.compressed))
                     .foregroundStyle(RingsideTheme.gold)
@@ -421,11 +432,17 @@ struct HomeView: View {
                 }
                 .padding(.horizontal, 14)
                 .padding(.vertical, 10)
-                .background(RingsideTheme.gold.opacity(0.08))
+                .background(
+                    LinearGradient(
+                        colors: [RingsideTheme.gold.opacity(0.1), RingsideTheme.gloveRed.opacity(0.05)],
+                        startPoint: .top,
+                        endPoint: .bottom
+                    )
+                )
                 .clipShape(.rect(cornerRadius: 14, style: .continuous))
                 .overlay(
                     RoundedRectangle(cornerRadius: 14, style: .continuous)
-                        .strokeBorder(RingsideTheme.gold.opacity(0.2), lineWidth: 0.5)
+                        .strokeBorder(RingsideTheme.gold.opacity(0.3), lineWidth: 0.75)
                 )
             }
             .padding(14)
@@ -475,7 +492,7 @@ struct HomeView: View {
             VStack(spacing: 16) {
                 Image(systemName: "calendar.badge.exclamationmark")
                     .font(.system(size: 40))
-                    .foregroundStyle(.white.opacity(0.2))
+                    .foregroundStyle(RingsideTheme.gloveRed.opacity(0.3))
                 Text("No events scheduled")
                     .font(.system(.headline, weight: .bold).width(.compressed))
                     .foregroundStyle(.white.opacity(0.3))
@@ -504,11 +521,11 @@ struct LiveDot: View {
 
     var body: some View {
         Circle()
-            .fill(RingsideTheme.liveRed)
+            .fill(RingsideTheme.gloveRed)
             .frame(width: 8, height: 8)
             .overlay(
                 Circle()
-                    .fill(RingsideTheme.liveRed.opacity(0.4))
+                    .fill(RingsideTheme.gloveRed.opacity(0.4))
                     .frame(width: isPulsing ? 18 : 8, height: isPulsing ? 18 : 8)
                     .opacity(isPulsing ? 0 : 1)
             )
@@ -543,14 +560,14 @@ struct FilterChip: View {
                         .fill(RingsideTheme.gold.opacity(0.18))
                 } else {
                     Capsule(style: .continuous)
-                        .fill(.ultraThinMaterial)
+                        .fill(RingsideTheme.charcoal)
                 }
             }
             .foregroundStyle(isSelected ? RingsideTheme.gold : .white.opacity(0.6))
             .clipShape(Capsule(style: .continuous))
             .overlay(
                 Capsule(style: .continuous)
-                    .strokeBorder(isSelected ? RingsideTheme.gold.opacity(0.4) : Color.white.opacity(0.08), lineWidth: 0.5)
+                    .strokeBorder(isSelected ? RingsideTheme.gold.opacity(0.5) : RingsideTheme.gold.opacity(0.1), lineWidth: 0.75)
             )
         }
         .sensoryFeedback(.selection, trigger: isSelected)
@@ -692,7 +709,7 @@ struct EventCard: View {
     private var collapsedContent: some View {
         VStack(alignment: .leading, spacing: 10) {
             if let mainFight = mainEventFight {
-                Divider().overlay(Color.white.opacity(0.06))
+                Divider().overlay(RingsideTheme.gold.opacity(0.1))
                     .padding(.top, 10)
 
                 FightRowCompact(fight: mainFight, eventName: event.name, venue: event.venue)
@@ -704,7 +721,7 @@ struct EventCard: View {
                         Text("\(totalFightCount - 1) more fight\(totalFightCount - 1 > 1 ? "s" : "")")
                             .font(.system(.caption2, weight: .semibold))
                     }
-                    .foregroundStyle(.white.opacity(0.35))
+                    .foregroundStyle(RingsideTheme.gloveRed.opacity(0.6))
                     .frame(maxWidth: .infinity)
                     .padding(.top, 4)
                 }
@@ -714,7 +731,7 @@ struct EventCard: View {
 
     private var expandedContent: some View {
         VStack(alignment: .leading, spacing: 10) {
-            Divider().overlay(Color.white.opacity(0.06))
+            Divider().overlay(RingsideTheme.gold.opacity(0.1))
                 .padding(.top, 10)
 
             ForEach(groupedFights, id: \.section) { group in
@@ -791,11 +808,18 @@ struct FightRowCompact: View {
         }
         .buttonStyle(.plain)
         .padding(12)
-        .background(Color.white.opacity(0.04))
+        .background(RingsideTheme.charcoalDark.opacity(0.8))
         .clipShape(.rect(cornerRadius: 12, style: .continuous))
         .overlay(
             RoundedRectangle(cornerRadius: 12, style: .continuous)
-                .strokeBorder(Color.white.opacity(0.06), lineWidth: 0.5)
+                .strokeBorder(
+                    LinearGradient(
+                        colors: [RingsideTheme.gold.opacity(0.2), RingsideTheme.gold.opacity(0.06)],
+                        startPoint: .topLeading,
+                        endPoint: .bottomTrailing
+                    ),
+                    lineWidth: 0.5
+                )
         )
     }
 
@@ -807,7 +831,7 @@ struct FightRowCompact: View {
                 LiveDot()
                 Text("RD \(fight.currentRound ?? 1)")
                     .font(.system(.caption2, weight: .bold))
-                    .foregroundStyle(RingsideTheme.liveRed)
+                    .foregroundStyle(RingsideTheme.gloveRed)
             }
         case .upcoming:
             Text("\(fight.scheduledRounds) RDS")
