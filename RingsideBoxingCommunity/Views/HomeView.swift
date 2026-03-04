@@ -1,6 +1,7 @@
 import SwiftUI
 
 struct HomeView: View {
+    @Environment(BoxingDataService.self) private var dataService
     @State private var selectedFilter: FightStatus? = nil
     @State private var appearAnimation: Bool = false
     @State private var selectedDate: Date = Calendar.current.startOfDay(for: Date())
@@ -9,7 +10,7 @@ struct HomeView: View {
     private let calendar = Calendar.current
 
     private var eventsForSelectedDate: [Event] {
-        SampleData.events.filter { calendar.isDate($0.date, inSameDayAs: selectedDate) }
+        dataService.events.filter { calendar.isDate($0.date, inSameDayAs: selectedDate) }
     }
 
     private var filteredEvents: [Event] {
@@ -35,7 +36,7 @@ struct HomeView: View {
     }
 
     private var highlightForDate: FighterHighlight? {
-        SampleData.highlightForDate(selectedDate)
+        RealBoxingData.highlightForDate(selectedDate)
     }
 
     var body: some View {
@@ -57,6 +58,9 @@ struct HomeView: View {
             }
             .scrollIndicators(.hidden)
             .background(Color.clear)
+            .refreshable {
+                dataService.refresh()
+            }
             .navigationBarTitleDisplayMode(.inline)
             .navigationDestination(for: Fight.self) { fight in
                 FightDetailView(fight: fight)

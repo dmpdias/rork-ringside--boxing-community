@@ -2,7 +2,7 @@ import SwiftUI
 
 @Observable
 class FeedViewModel {
-    var interactions: [String: FightInteraction] = SampleData.interactionsForFights()
+    var interactions: [String: FightInteraction] = RealBoxingData.interactionsForFights()
     var showingCommentSheet: Bool = false
     var activeCommentFightId: String?
     var newCommentText: String = ""
@@ -12,8 +12,10 @@ class FeedViewModel {
     var ratingCommentDraft: String = ""
     var selectedTab: Int = 0
 
+    var dataEvents: [Event] = RealBoxingData.allEvents
+
     var allFightsWithContext: [(fight: Fight, eventName: String, venue: String)] {
-        SampleData.events.flatMap { event in
+        dataEvents.flatMap { event in
             event.fights.map { (fight: $0, eventName: event.name, venue: event.venue) }
         }
     }

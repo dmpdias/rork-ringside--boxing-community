@@ -1,8 +1,9 @@
 import SwiftUI
 
 struct FeedView: View {
+    @Environment(BoxingDataService.self) private var dataService
     @State private var viewModel = FeedViewModel()
-    @State private var posts: [Post] = SampleData.samplePosts
+    @State private var posts: [Post] = RealBoxingData.samplePosts
     @State private var showCompose: Bool = false
     @State private var appearAnimation: Bool = false
 

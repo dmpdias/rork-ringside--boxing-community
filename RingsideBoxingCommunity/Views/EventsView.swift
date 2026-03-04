@@ -1,6 +1,7 @@
 import SwiftUI
 
 struct EventsView: View {
+    @Environment(BoxingDataService.self) private var dataService
     @State private var selectedWeekOffset: Int = 0
     @State private var carouselIndex: Int = 0
     @State private var appearAnimation: Bool = false
@@ -31,7 +32,7 @@ struct EventsView: View {
     }
 
     private var eventsThisWeek: [Event] {
-        SampleData.events.filter { event in
+        dataService.events.filter { event in
             let eventDay = calendar.startOfDay(for: event.date)
             return eventDay >= weekStart && eventDay <= weekEnd
         }.sorted { $0.date < $1.date }
@@ -69,6 +70,9 @@ struct EventsView: View {
             }
             .scrollIndicators(.hidden)
             .background(Color.clear)
+            .refreshable {
+                dataService.refresh()
+            }
             .navigationBarTitleDisplayMode(.inline)
             .navigationDestination(for: Fight.self) { fight in
                 FightDetailView(fight: fight)
