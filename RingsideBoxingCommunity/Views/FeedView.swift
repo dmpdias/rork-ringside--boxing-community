@@ -4,12 +4,14 @@ struct FeedView: View {
     @State private var viewModel = FeedViewModel()
     @State private var posts: [Post] = SampleData.samplePosts
     @State private var showCompose: Bool = false
+    @State private var appearAnimation: Bool = false
 
     var body: some View {
         NavigationStack {
             ZStack(alignment: .bottomTrailing) {
                 ScrollView {
                     VStack(spacing: 0) {
+                        headerSection
                         feedToggle
                         if viewModel.selectedTab == 0 {
                             fightFeedContent
@@ -25,9 +27,11 @@ struct FeedView: View {
                     composeButton
                 }
             }
-            .navigationTitle("Community")
             .navigationBarTitleDisplayMode(.inline)
-            .toolbarColorScheme(.dark, for: .navigationBar)
+            .toolbar(.hidden, for: .navigationBar)
+            .onAppear {
+                withAnimation(.easeOut(duration: 0.5)) { appearAnimation = true }
+            }
             .sheet(isPresented: $showCompose) {
                 ComposeSheet()
                     .presentationDetents([.medium])
@@ -43,6 +47,23 @@ struct FeedView: View {
                 }
             }
         }
+    }
+
+    private var headerSection: some View {
+        Text("COMMUNITY")
+            .font(.system(size: 38, weight: .black, design: .default).width(.compressed))
+            .foregroundStyle(
+                LinearGradient(
+                    colors: [.white, RingsideTheme.gold.opacity(0.9)],
+                    startPoint: .leading,
+                    endPoint: .trailing
+                )
+            )
+            .frame(maxWidth: .infinity, alignment: .leading)
+            .padding(.horizontal)
+            .padding(.top, 58)
+            .opacity(appearAnimation ? 1 : 0)
+            .offset(y: appearAnimation ? 0 : 10)
     }
 
     private var feedToggle: some View {
