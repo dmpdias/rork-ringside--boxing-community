@@ -25,7 +25,8 @@ struct SampleData {
         viewerCount: 24_832,
         communityRating: 4.8,
         commentCount: 3_241,
-        cardSection: .mainCard
+        cardSection: .mainCard,
+        isTitleFight: true
     )
 
     static let fighterHaney = Fighter(id: "f13", name: "Devin Haney", nickname: "The Dream", record: "31-0-0", country: "🇺🇸", imageURL: nil)
@@ -45,8 +46,8 @@ struct SampleData {
             date: day(-7),
             venue: "O2 Arena, London",
             fights: [
-                Fight(id: "fight_m7a", fighterA: fighterFury, fighterB: fighterBeterbiev, weightClass: .heavyweight, scheduledRounds: 12, status: .completed, currentRound: nil, viewerCount: nil, communityRating: 4.5, commentCount: 3_450, cardSection: .mainCard),
-                Fight(id: "fight_m7b", fighterA: fighterMunguia, fighterB: fighterNery, weightClass: .superMiddleweight, scheduledRounds: 10, status: .completed, currentRound: nil, viewerCount: nil, communityRating: 3.6, commentCount: 890, cardSection: .undercard)
+                Fight(id: "fight_m7a", fighterA: fighterFury, fighterB: fighterBeterbiev, weightClass: .heavyweight, scheduledRounds: 12, status: .completed, currentRound: nil, viewerCount: nil, communityRating: 4.5, commentCount: 3_450, cardSection: .mainCard, isTitleFight: true, result: FightResult(method: "UD", scores: "116–112, 115–113, 115–113", winnerName: "Tyson Fury")),
+                Fight(id: "fight_m7b", fighterA: fighterMunguia, fighterB: fighterNery, weightClass: .superMiddleweight, scheduledRounds: 10, status: .completed, currentRound: nil, viewerCount: nil, communityRating: 3.6, commentCount: 890, cardSection: .undercard, result: FightResult(method: "TKO R6", scores: nil, winnerName: "Jaime Munguia"))
             ],
             isMainEvent: false
         ),
@@ -56,8 +57,8 @@ struct SampleData {
             date: day(-5),
             venue: "Mohegan Sun Arena, CT",
             fights: [
-                Fight(id: "fight_m5a", fighterA: fighterTank, fighterB: fighterHaney, weightClass: .lightweight, scheduledRounds: 12, status: .completed, currentRound: nil, viewerCount: nil, communityRating: 4.8, commentCount: 6_200, cardSection: .mainCard),
-                Fight(id: "fight_m5b", fighterA: fighterShakur, fighterB: fighterLoma, weightClass: .superLightweight, scheduledRounds: 12, status: .completed, currentRound: nil, viewerCount: nil, communityRating: 4.2, commentCount: 1_870, cardSection: .undercard)
+                Fight(id: "fight_m5a", fighterA: fighterTank, fighterB: fighterHaney, weightClass: .lightweight, scheduledRounds: 12, status: .completed, currentRound: nil, viewerCount: nil, communityRating: 4.8, commentCount: 6_200, cardSection: .mainCard, isTitleFight: true, result: FightResult(method: "KO R8", scores: nil, winnerName: "Gervonta Davis")),
+                Fight(id: "fight_m5b", fighterA: fighterShakur, fighterB: fighterLoma, weightClass: .superLightweight, scheduledRounds: 12, status: .completed, currentRound: nil, viewerCount: nil, communityRating: 4.2, commentCount: 1_870, cardSection: .undercard, result: FightResult(method: "SD", scores: "115–113, 114–114, 116–112", winnerName: "Shakur Stevenson"))
             ],
             isMainEvent: true
         ),
@@ -67,8 +68,8 @@ struct SampleData {
             date: day(-2),
             venue: "Barclays Center, Brooklyn",
             fights: [
-                Fight(id: "fight_m2a", fighterA: fighterHaney, fighterB: fighterShakur, weightClass: .superLightweight, scheduledRounds: 12, status: .completed, currentRound: nil, viewerCount: nil, communityRating: 4.4, commentCount: 2_780, cardSection: .mainCard),
-                Fight(id: "fight_m2b", fighterA: fighterMunguia, fighterB: fighterCharlo, weightClass: .superMiddleweight, scheduledRounds: 12, status: .completed, currentRound: nil, viewerCount: nil, communityRating: 3.9, commentCount: 1_120, cardSection: .undercard)
+                Fight(id: "fight_m2a", fighterA: fighterHaney, fighterB: fighterShakur, weightClass: .superLightweight, scheduledRounds: 12, status: .completed, currentRound: nil, viewerCount: nil, communityRating: 4.4, commentCount: 2_780, cardSection: .mainCard, result: FightResult(method: "UD", scores: "117–111, 116–112, 116–112", winnerName: "Devin Haney")),
+                Fight(id: "fight_m2b", fighterA: fighterMunguia, fighterB: fighterCharlo, weightClass: .superMiddleweight, scheduledRounds: 12, status: .completed, currentRound: nil, viewerCount: nil, communityRating: 3.9, commentCount: 1_120, cardSection: .undercard, result: FightResult(method: "MD", scores: "115–113, 115–113, 114–114", winnerName: "Jaime Munguia"))
             ],
             isMainEvent: false
         ),
@@ -78,8 +79,8 @@ struct SampleData {
             date: day(-1),
             venue: "Crypto.com Arena, Los Angeles",
             fights: [
-                Fight(id: "fight_m1a", fighterA: fighterCrawford, fighterB: fighterSpence, weightClass: .welterweight, scheduledRounds: 12, status: .completed, currentRound: nil, viewerCount: nil, communityRating: 4.9, commentCount: 5_102, cardSection: .mainCard),
-                Fight(id: "fight_m1b", fighterA: fighterInoue, fighterB: fighterNery, weightClass: .bantamweight, scheduledRounds: 12, status: .completed, currentRound: nil, viewerCount: nil, communityRating: 4.3, commentCount: 987, cardSection: .undercard)
+                Fight(id: "fight_m1a", fighterA: fighterCrawford, fighterB: fighterSpence, weightClass: .welterweight, scheduledRounds: 12, status: .completed, currentRound: nil, viewerCount: nil, communityRating: 4.9, commentCount: 5_102, cardSection: .mainCard, isTitleFight: true, result: FightResult(method: "TKO R9", scores: nil, winnerName: "Terence Crawford")),
+                Fight(id: "fight_m1b", fighterA: fighterInoue, fighterB: fighterNery, weightClass: .bantamweight, scheduledRounds: 12, status: .completed, currentRound: nil, viewerCount: nil, communityRating: 4.3, commentCount: 987, cardSection: .undercard, result: FightResult(method: "KO R6", scores: nil, winnerName: "Naoya Inoue"))
             ],
             isMainEvent: false
         ),
@@ -91,8 +92,8 @@ struct SampleData {
             fights: [
                 liveFight,
                 Fight(id: "fight2", fighterA: fighterTank, fighterB: fighterLoma, weightClass: .lightweight, scheduledRounds: 12, status: .live, currentRound: 3, viewerCount: 18_420, communityRating: 4.5, commentCount: 1_892, cardSection: .mainCard),
-                Fight(id: "fight2b", fighterA: fighterHaney, fighterB: fighterShakur, weightClass: .superLightweight, scheduledRounds: 10, status: .upcoming, currentRound: nil, viewerCount: nil, communityRating: 4.1, commentCount: 540, cardSection: .undercard),
-                Fight(id: "fight2c", fighterA: fighterMunguia, fighterB: fighterCharlo, weightClass: .superMiddleweight, scheduledRounds: 10, status: .upcoming, currentRound: nil, viewerCount: nil, communityRating: 3.8, commentCount: 320, cardSection: .prelims)
+                Fight(id: "fight2b", fighterA: fighterHaney, fighterB: fighterShakur, weightClass: .superLightweight, scheduledRounds: 10, status: .upcoming, currentRound: nil, viewerCount: nil, communityRating: 4.1, commentCount: 540, cardSection: .undercard, startTime: Date().addingTimeInterval(5040)),
+                Fight(id: "fight2c", fighterA: fighterMunguia, fighterB: fighterCharlo, weightClass: .superMiddleweight, scheduledRounds: 10, status: .upcoming, currentRound: nil, viewerCount: nil, communityRating: 3.8, commentCount: 320, cardSection: .prelims, startTime: Date().addingTimeInterval(9000))
             ],
             isMainEvent: true
         ),
@@ -102,7 +103,7 @@ struct SampleData {
             date: day(1),
             venue: "The Forum, Inglewood",
             fights: [
-                Fight(id: "fight_p1a", fighterA: fighterBeterbiev, fighterB: fighterBivol, weightClass: .lightHeavyweight, scheduledRounds: 12, status: .upcoming, currentRound: nil, viewerCount: nil, communityRating: 4.7, commentCount: 2_310, cardSection: .mainCard)
+                Fight(id: "fight_p1a", fighterA: fighterBeterbiev, fighterB: fighterBivol, weightClass: .lightHeavyweight, scheduledRounds: 12, status: .upcoming, currentRound: nil, viewerCount: nil, communityRating: 4.7, commentCount: 2_310, cardSection: .mainCard, isTitleFight: true, startTime: day(1).addingTimeInterval(72000))
             ],
             isMainEvent: false
         ),
@@ -112,8 +113,8 @@ struct SampleData {
             date: day(3),
             venue: "Madison Square Garden, New York",
             fights: [
-                Fight(id: "fight4", fighterA: fighterBeterbiev, fighterB: fighterBivol, weightClass: .lightHeavyweight, scheduledRounds: 12, status: .upcoming, currentRound: nil, viewerCount: nil, communityRating: 4.7, commentCount: 2_310, cardSection: .mainCard),
-                Fight(id: "fight5", fighterA: fighterInoue, fighterB: fighterNery, weightClass: .bantamweight, scheduledRounds: 12, status: .upcoming, currentRound: nil, viewerCount: nil, communityRating: 4.3, commentCount: 987, cardSection: .undercard)
+                Fight(id: "fight4", fighterA: fighterBeterbiev, fighterB: fighterBivol, weightClass: .lightHeavyweight, scheduledRounds: 12, status: .upcoming, currentRound: nil, viewerCount: nil, communityRating: 4.7, commentCount: 2_310, cardSection: .mainCard, isTitleFight: true, startTime: day(3).addingTimeInterval(72000)),
+                Fight(id: "fight5", fighterA: fighterInoue, fighterB: fighterNery, weightClass: .bantamweight, scheduledRounds: 12, status: .upcoming, currentRound: nil, viewerCount: nil, communityRating: 4.3, commentCount: 987, cardSection: .undercard, startTime: day(3).addingTimeInterval(64800))
             ],
             isMainEvent: false
         ),
@@ -134,7 +135,7 @@ struct SampleData {
             date: day(7),
             venue: "Kingdom Arena, Riyadh",
             fights: [
-                Fight(id: "fight6", fighterA: fighterFury, fighterB: fighterUsyk, weightClass: .heavyweight, scheduledRounds: 12, status: .upcoming, currentRound: nil, viewerCount: nil, communityRating: 4.6, commentCount: 8_430, cardSection: .mainCard)
+                Fight(id: "fight6", fighterA: fighterFury, fighterB: fighterUsyk, weightClass: .heavyweight, scheduledRounds: 12, status: .upcoming, currentRound: nil, viewerCount: nil, communityRating: 4.6, commentCount: 8_430, cardSection: .mainCard, isTitleFight: true, startTime: day(7).addingTimeInterval(72000))
             ],
             isMainEvent: false
         ),
@@ -144,7 +145,7 @@ struct SampleData {
             date: day(9),
             venue: "AT&T Stadium, Dallas",
             fights: [
-                Fight(id: "fight_p9a", fighterA: fighterCrawford, fighterB: fighterCanelo, weightClass: .superMiddleweight, scheduledRounds: 12, status: .upcoming, currentRound: nil, viewerCount: nil, communityRating: 5.0, commentCount: 12_340, cardSection: .mainCard),
+                Fight(id: "fight_p9a", fighterA: fighterCrawford, fighterB: fighterCanelo, weightClass: .superMiddleweight, scheduledRounds: 12, status: .upcoming, currentRound: nil, viewerCount: nil, communityRating: 5.0, commentCount: 12_340, cardSection: .mainCard, isTitleFight: true, startTime: day(9).addingTimeInterval(72000)),
                 Fight(id: "fight_p9b", fighterA: fighterSpence, fighterB: fighterCharlo, weightClass: .superWelterweight, scheduledRounds: 12, status: .upcoming, currentRound: nil, viewerCount: nil, communityRating: 4.1, commentCount: 1_560, cardSection: .undercard)
             ],
             isMainEvent: true

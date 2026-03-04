@@ -1,5 +1,11 @@
 import Foundation
 
+nonisolated enum FightPhase: String, Sendable, CaseIterable {
+    case pre = "PRE"
+    case live = "LIVE"
+    case post = "POST"
+}
+
 nonisolated enum FightStatus: String, Sendable, CaseIterable {
     case live = "Live"
     case upcoming = "Upcoming"
@@ -10,6 +16,14 @@ nonisolated enum FightStatus: String, Sendable, CaseIterable {
         case .live: return "Live"
         case .upcoming: return "Upcoming"
         case .completed: return "Finished"
+        }
+    }
+
+    var phase: FightPhase {
+        switch self {
+        case .upcoming: return .pre
+        case .live: return .live
+        case .completed: return .post
         }
     }
 }
@@ -43,6 +57,33 @@ struct Fighter: Identifiable, Sendable {
     let imageURL: String?
 }
 
+nonisolated enum FightTag: String, Sendable, CaseIterable {
+    case war = "War"
+    case robbery = "Robbery"
+    case clinic = "Clinic"
+    case snoozer = "Snoozer"
+    case upset = "Upset"
+}
+
+nonisolated enum RoundTag: String, Sendable, CaseIterable {
+    case knockdown = "Knockdown"
+    case close = "Close"
+    case dominant = "Dominant"
+}
+
+nonisolated enum PredictionMethod: String, Sendable, CaseIterable {
+    case ko = "KO/TKO"
+    case decision = "Decision"
+    case split = "Split Decision"
+    case draw = "Draw"
+}
+
+struct FightResult: Sendable {
+    let method: String
+    let scores: String?
+    let winnerName: String?
+}
+
 struct Fight: Identifiable, Sendable {
     let id: String
     let fighterA: Fighter
@@ -55,6 +96,26 @@ struct Fight: Identifiable, Sendable {
     let communityRating: Double
     let commentCount: Int
     let cardSection: CardSection
+    let isTitleFight: Bool
+    let startTime: Date?
+    let result: FightResult?
+
+    init(id: String, fighterA: Fighter, fighterB: Fighter, weightClass: WeightClass, scheduledRounds: Int, status: FightStatus, currentRound: Int? = nil, viewerCount: Int? = nil, communityRating: Double = 0, commentCount: Int = 0, cardSection: CardSection = .mainCard, isTitleFight: Bool = false, startTime: Date? = nil, result: FightResult? = nil) {
+        self.id = id
+        self.fighterA = fighterA
+        self.fighterB = fighterB
+        self.weightClass = weightClass
+        self.scheduledRounds = scheduledRounds
+        self.status = status
+        self.currentRound = currentRound
+        self.viewerCount = viewerCount
+        self.communityRating = communityRating
+        self.commentCount = commentCount
+        self.cardSection = cardSection
+        self.isTitleFight = isTitleFight
+        self.startTime = startTime
+        self.result = result
+    }
 }
 
 struct FighterHighlight: Sendable {
@@ -79,6 +140,25 @@ struct RoundScore: Identifiable, Sendable {
     var fighterBScore: Int
     let communityAScore: Double
     let communityBScore: Double
+}
+
+struct UserRoundRating: Identifiable, Sendable {
+    var id: Int { round }
+    let round: Int
+    var score: Double
+    var tags: Set<RoundTag>
+}
+
+struct DiscussionComment: Identifiable, Sendable {
+    let id: String
+    let userName: String
+    let text: String
+    let timestamp: Date
+    var thumbsUp: Int
+    var thumbsDown: Int
+    var hasThumbedUp: Bool
+    var hasThumbedDown: Bool
+    let isPrediction: Bool
 }
 
 struct FighterStats: Sendable {
