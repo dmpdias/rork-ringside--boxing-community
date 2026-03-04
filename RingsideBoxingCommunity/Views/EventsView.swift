@@ -315,7 +315,7 @@ struct TopFightCard: View {
 
                 HStack(spacing: 0) {
                     VStack(spacing: 8) {
-                        FighterAvatar(imageURL: fight.fighterA.imageURL, size: 56)
+                        FighterAvatar(imageURL: fight.fighterA.imageURL, name: fight.fighterA.name, size: 56)
                             .overlay(
                                 Circle()
                                     .strokeBorder(RingsideTheme.gold.opacity(0.3), lineWidth: 1)
@@ -339,7 +339,7 @@ struct TopFightCard: View {
                     }
 
                     VStack(spacing: 8) {
-                        FighterAvatar(imageURL: fight.fighterB.imageURL, size: 56)
+                        FighterAvatar(imageURL: fight.fighterB.imageURL, name: fight.fighterB.name, size: 56)
                             .overlay(
                                 Circle()
                                     .strokeBorder(RingsideTheme.gold.opacity(0.3), lineWidth: 1)
@@ -451,7 +451,7 @@ struct EventsFightRow: View {
         VStack(spacing: 8) {
             HStack(spacing: 0) {
                 HStack(spacing: 8) {
-                    FighterAvatar(imageURL: fight.fighterA.imageURL, size: 28)
+                    FighterAvatar(imageURL: fight.fighterA.imageURL, name: fight.fighterA.name, size: 28)
                     Text(fight.fighterA.name.components(separatedBy: " ").last ?? "")
                         .font(.system(.subheadline, weight: .bold).width(.compressed))
                         .foregroundStyle(.white)
@@ -465,7 +465,7 @@ struct EventsFightRow: View {
                     Text(fight.fighterB.name.components(separatedBy: " ").last ?? "")
                         .font(.system(.subheadline, weight: .bold).width(.compressed))
                         .foregroundStyle(.white)
-                    FighterAvatar(imageURL: fight.fighterB.imageURL, size: 28)
+                    FighterAvatar(imageURL: fight.fighterB.imageURL, name: fight.fighterB.name, size: 28)
                 }
                 .frame(maxWidth: .infinity, alignment: .trailing)
             }

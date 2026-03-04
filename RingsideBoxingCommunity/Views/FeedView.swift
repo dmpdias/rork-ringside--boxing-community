@@ -242,7 +242,7 @@ struct FeedFightCard: View {
     private var matchupSection: some View {
         HStack(spacing: 0) {
             VStack(spacing: 6) {
-                FighterAvatar(imageURL: fight.fighterA.imageURL, size: 48)
+                FighterAvatar(imageURL: fight.fighterA.imageURL, name: fight.fighterA.name, size: 48)
                     .overlay(
                         Circle()
                             .strokeBorder(
@@ -275,7 +275,7 @@ struct FeedFightCard: View {
             .frame(width: 60)
 
             VStack(spacing: 6) {
-                FighterAvatar(imageURL: fight.fighterB.imageURL, size: 48)
+                FighterAvatar(imageURL: fight.fighterB.imageURL, name: fight.fighterB.name, size: 48)
                     .overlay(
                         Circle()
                             .strokeBorder(

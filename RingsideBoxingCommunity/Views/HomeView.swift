@@ -272,7 +272,7 @@ struct HomeView: View {
                                         )
                                     )
                                     .frame(width: 76, height: 76)
-                                FighterAvatar(imageURL: fight.fighterA.imageURL, size: 58)
+                                FighterAvatar(imageURL: fight.fighterA.imageURL, name: fight.fighterA.name, size: 58)
                                     .overlay(
                                         Circle()
                                             .strokeBorder(
@@ -326,7 +326,7 @@ struct HomeView: View {
                                         )
                                     )
                                     .frame(width: 76, height: 76)
-                                FighterAvatar(imageURL: fight.fighterB.imageURL, size: 58)
+                                FighterAvatar(imageURL: fight.fighterB.imageURL, name: fight.fighterB.name, size: 58)
                                     .overlay(
                                         Circle()
                                             .strokeBorder(
@@ -425,7 +425,7 @@ struct HomeView: View {
             .padding(.horizontal)
 
             HStack(spacing: 14) {
-                FighterAvatar(imageURL: highlight.fighter.imageURL, size: 64)
+                FighterAvatar(imageURL: highlight.fighter.imageURL, name: highlight.fighter.name, size: 64)
                     .overlay(
                         Circle()
                             .strokeBorder(
@@ -606,7 +606,18 @@ struct FilterChip: View {
 
 struct FighterAvatar: View {
     let imageURL: String?
+    var name: String = ""
     var size: CGFloat = 30
+
+    private var initials: String {
+        let parts = name.split(separator: " ")
+        if parts.count >= 2 {
+            return String(parts[0].prefix(1) + parts[1].prefix(1)).uppercased()
+        } else if let first = parts.first {
+            return String(first.prefix(2)).uppercased()
+        }
+        return "?"
+    }
 
     var body: some View {
         Group {
@@ -620,7 +631,7 @@ struct FighterAvatar: View {
                                     .resizable()
                                     .aspectRatio(contentMode: .fill)
                             } else if phase.error != nil {
-                                placeholderIcon
+                                initialsView
                             } else {
                                 ProgressView()
                                     .tint(.white.opacity(0.3))
@@ -630,18 +641,24 @@ struct FighterAvatar: View {
                     }
                     .clipShape(Circle())
             } else {
-                placeholderIcon
+                initialsView
                     .frame(width: size, height: size)
-                    .background(Color.white.opacity(0.08))
+                    .background(
+                        LinearGradient(
+                            colors: [Color(red: 0.7, green: 0.15, blue: 0.15), Color(red: 0.4, green: 0.08, blue: 0.08)],
+                            startPoint: .topLeading,
+                            endPoint: .bottomTrailing
+                        )
+                    )
                     .clipShape(Circle())
             }
         }
     }
 
-    private var placeholderIcon: some View {
-        Image(systemName: "person.fill")
-            .font(.system(size: size * 0.4))
-            .foregroundStyle(.white.opacity(0.3))
+    private var initialsView: some View {
+        Text(initials)
+            .font(.system(size: size * 0.35, weight: .bold, design: .default))
+            .foregroundStyle(.white.opacity(0.9))
             .frame(width: size, height: size)
     }
 }
@@ -791,7 +808,7 @@ struct FightRowCompact: View {
             VStack(spacing: 8) {
                 HStack(spacing: 0) {
                     HStack(spacing: 8) {
-                        FighterAvatar(imageURL: fight.fighterA.imageURL, size: 28)
+                        FighterAvatar(imageURL: fight.fighterA.imageURL, name: fight.fighterA.name, size: 28)
                         Text(fight.fighterA.name.components(separatedBy: " ").last ?? "")
                             .font(.system(.subheadline, weight: .bold).width(.compressed))
                             .foregroundStyle(.white)
@@ -805,7 +822,7 @@ struct FightRowCompact: View {
                         Text(fight.fighterB.name.components(separatedBy: " ").last ?? "")
                             .font(.system(.subheadline, weight: .bold).width(.compressed))
                             .foregroundStyle(.white)
-                        FighterAvatar(imageURL: fight.fighterB.imageURL, size: 28)
+                        FighterAvatar(imageURL: fight.fighterB.imageURL, name: fight.fighterB.name, size: 28)
                     }
                     .frame(maxWidth: .infinity, alignment: .trailing)
                 }
