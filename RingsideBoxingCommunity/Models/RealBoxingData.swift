@@ -336,6 +336,44 @@ struct RealBoxingData {
         return nil
     }
 
+    static func highlightForWeek(startOfWeek: Date) -> FighterHighlight? {
+        let cal = Calendar.current
+        let weekEnd = cal.date(byAdding: .day, value: 6, to: startOfWeek) ?? startOfWeek
+
+        var bestHighlight: FighterHighlight?
+        var bestGrade: Double = -1
+
+        for dayOffset in 0...6 {
+            guard let day = cal.date(byAdding: .day, value: dayOffset, to: startOfWeek) else { continue }
+            let key = formatDate(day)
+            if let highlight = fighterHighlights[key], highlight.grade > bestGrade {
+                bestGrade = highlight.grade
+                bestHighlight = highlight
+            }
+        }
+
+        if let highlight = bestHighlight { return highlight }
+
+        let weekEvents = allEvents.filter { event in
+            let eventDay = cal.startOfDay(for: event.date)
+            return eventDay >= startOfWeek && eventDay <= weekEnd
+        }
+
+        let completedFights = weekEvents.flatMap(\.fights).filter { $0.status == .completed }
+        if let topFight = completedFights.max(by: { $0.communityRating < $1.communityRating }) {
+            let winner = topFight.result?.winnerName ?? topFight.fighterA.name
+            let fighter = topFight.fighterA.name == winner ? topFight.fighterA : topFight.fighterB
+            return FighterHighlight(fighter: fighter, grade: topFight.communityRating * 2, fightContext: "\(topFight.fighterA.name) vs \(topFight.fighterB.name)")
+        }
+
+        let upcomingFights = weekEvents.flatMap(\.fights).filter { $0.status == .upcoming }
+        if let topUpcoming = upcomingFights.max(by: { $0.commentCount < $1.commentCount }) {
+            return FighterHighlight(fighter: topUpcoming.fighterA, grade: topUpcoming.communityRating * 2, fightContext: "vs \(topUpcoming.fighterB.name) · \(topUpcoming.weightClass.rawValue)")
+        }
+
+        return highlightForDate(startOfWeek)
+    }
+
     // MARK: - Community Posts
 
     static let samplePosts: [Post] = [

@@ -4,39 +4,52 @@ struct HomeView: View {
     @Environment(BoxingDataService.self) private var dataService
     @State private var selectedFilter: FightStatus? = nil
     @State private var appearAnimation: Bool = false
-    @State private var selectedDate: Date = Calendar.current.startOfDay(for: Date())
+    @State private var selectedWeekStart: Date = {
+        let cal = Calendar.current
+        let today = cal.startOfDay(for: Date())
+        let weekday = cal.component(.weekday, from: today)
+        return cal.date(byAdding: .day, value: -(weekday - cal.firstWeekday), to: today) ?? today
+    }()
     @State private var viewModel = HomeViewModel()
 
     private let calendar = Calendar.current
 
-    private var eventsForSelectedDate: [Event] {
-        dataService.events.filter { calendar.isDate($0.date, inSameDayAs: selectedDate) }
+    private var weekEnd: Date {
+        calendar.date(byAdding: .day, value: 6, to: selectedWeekStart) ?? selectedWeekStart
+    }
+
+    private var eventsForSelectedWeek: [Event] {
+        dataService.events.filter { event in
+            let eventDay = calendar.startOfDay(for: event.date)
+            return eventDay >= selectedWeekStart && eventDay <= weekEnd
+        }
     }
 
     private var filteredEvents: [Event] {
-        let dayEvents = eventsForSelectedDate
-        guard let filter = selectedFilter else { return dayEvents }
-        return dayEvents.compactMap { event in
+        let weekEvents = eventsForSelectedWeek
+        guard let filter = selectedFilter else { return weekEvents }
+        return weekEvents.compactMap { event in
             let filtered = event.fights.filter { $0.status == filter }
             guard !filtered.isEmpty else { return nil }
             return Event(id: event.id, name: event.name, date: event.date, venue: event.venue, fights: filtered, isMainEvent: event.isMainEvent)
         }
     }
 
-    private var isToday: Bool {
-        calendar.isDateInToday(selectedDate)
+    private var isCurrentWeek: Bool {
+        let today = calendar.startOfDay(for: Date())
+        return today >= selectedWeekStart && today <= weekEnd
     }
 
     private var hasLiveFight: Bool {
-        eventsForSelectedDate.flatMap(\.fights).contains { $0.status == .live }
+        eventsForSelectedWeek.flatMap(\.fights).contains { $0.status == .live }
     }
 
-    private var liveFightForDate: Fight? {
-        eventsForSelectedDate.flatMap(\.fights).first { $0.status == .live }
+    private var liveFightForWeek: Fight? {
+        eventsForSelectedWeek.flatMap(\.fights).first { $0.status == .live }
     }
 
-    private var highlightForDate: FighterHighlight? {
-        RealBoxingData.highlightForDate(selectedDate)
+    private var highlightForWeek: FighterHighlight? {
+        RealBoxingData.highlightForWeek(startOfWeek: selectedWeekStart)
     }
 
     var body: some View {
@@ -45,10 +58,10 @@ struct HomeView: View {
                 VStack(alignment: .leading, spacing: 24) {
                     headerSection
                     dateNavigator
-                    if let live = liveFightForDate {
+                    if let live = liveFightForWeek {
                         liveBannerView(fight: live)
                     }
-                    if let highlight = highlightForDate {
+                    if let highlight = highlightForWeek {
                         fighterOfTheDaySection(highlight: highlight)
                     }
                     eventsHeader
@@ -76,7 +89,7 @@ struct HomeView: View {
 
     private var headerSection: some View {
         HStack(alignment: .bottom, spacing: 10) {
-            Text("FIGHT NIGHT")
+            Text("THE JAB")
                 .font(.system(size: 38, weight: .black, design: .default).width(.compressed))
                 .foregroundStyle(
                     LinearGradient(
@@ -96,11 +109,24 @@ struct HomeView: View {
         .offset(y: appearAnimation ? 0 : 10)
     }
 
+    private var weekRangeLabel: String {
+        let endDate = weekEnd
+        let startMonth = selectedWeekStart.formatted(.dateTime.month(.abbreviated))
+        let endMonth = endDate.formatted(.dateTime.month(.abbreviated))
+        let startDay = selectedWeekStart.formatted(.dateTime.day())
+        let endDay = endDate.formatted(.dateTime.day())
+        if startMonth == endMonth {
+            return "\(startMonth) \(startDay) – \(endDay)"
+        } else {
+            return "\(startMonth) \(startDay) – \(endMonth) \(endDay)"
+        }
+    }
+
     private var dateNavigator: some View {
         HStack(spacing: 0) {
             Button {
                 withAnimation(.snappy(duration: 0.3)) {
-                    selectedDate = calendar.date(byAdding: .day, value: -1, to: selectedDate)!
+                    selectedWeekStart = calendar.date(byAdding: .weekOfYear, value: -1, to: selectedWeekStart)!
                 }
             } label: {
                 Image(systemName: "chevron.left")
@@ -116,13 +142,13 @@ struct HomeView: View {
             Spacer()
 
             VStack(spacing: 3) {
-                if isToday {
-                    Text("TODAY")
+                if isCurrentWeek {
+                    Text("THIS WEEK")
                         .font(.system(.caption, weight: .heavy).width(.compressed))
                         .tracking(1.5)
                         .foregroundStyle(RingsideTheme.gold)
                 }
-                Text(selectedDate, format: .dateTime.weekday(.wide).month(.abbreviated).day())
+                Text(weekRangeLabel)
                     .font(.system(.subheadline, weight: .bold))
                     .foregroundStyle(
                         LinearGradient(
@@ -138,7 +164,7 @@ struct HomeView: View {
 
             Button {
                 withAnimation(.snappy(duration: 0.3)) {
-                    selectedDate = calendar.date(byAdding: .day, value: 1, to: selectedDate)!
+                    selectedWeekStart = calendar.date(byAdding: .weekOfYear, value: 1, to: selectedWeekStart)!
                 }
             } label: {
                 Image(systemName: "chevron.right")
@@ -187,7 +213,7 @@ struct HomeView: View {
         )
         .shadow(color: RingsideTheme.gold.opacity(0.08), radius: 14, y: 5)
         .padding(.horizontal)
-        .sensoryFeedback(.selection, trigger: selectedDate)
+        .sensoryFeedback(.selection, trigger: selectedWeekStart)
     }
 
     private func liveBannerView(fight: Fight) -> some View {
@@ -392,7 +418,7 @@ struct HomeView: View {
                 Image(systemName: "flame.fill")
                     .font(.caption)
                     .foregroundStyle(RingsideTheme.gloveRed)
-                Text("HIGHLIGHT OF THE DAY")
+                Text("HIGHLIGHT OF THE WEEK")
                     .font(.system(.caption, weight: .heavy).width(.compressed))
                     .foregroundStyle(RingsideTheme.gold)
             }
@@ -463,11 +489,11 @@ struct HomeView: View {
                 Image(systemName: "calendar")
                     .font(.caption)
                     .foregroundStyle(RingsideTheme.gold)
-                Text("EVENTS OF THE DAY")
+                Text("EVENTS OF THE WEEK")
                     .font(.system(.caption, weight: .heavy).width(.compressed))
                     .foregroundStyle(RingsideTheme.gold)
                 Spacer()
-                Text("\(eventsForSelectedDate.flatMap(\.fights).count) fights")
+                Text("\(eventsForSelectedWeek.flatMap(\.fights).count) fights")
                     .font(.system(.caption2, weight: .medium))
                     .foregroundStyle(.white.opacity(0.35))
             }
