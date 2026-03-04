@@ -30,6 +30,9 @@ struct FightDetailView: View {
         .background(MeshBackgroundView())
         .navigationBarTitleDisplayMode(.inline)
         .toolbarColorScheme(.dark, for: .navigationBar)
+        .navigationDestination(for: Fighter.self) { fighter in
+            FighterDetailView(fighter: fighter)
+        }
         .toolbar {
             ToolbarItem(placement: .principal) {
                 Text(fight.weightClass.rawValue.uppercased())
@@ -80,6 +83,7 @@ struct FightDetailView: View {
     }
 
     private func fighterColumn(fighter: Fighter) -> some View {
+        NavigationLink(value: fighter) {
         VStack(spacing: 10) {
             if let urlString = fighter.imageURL, let url = URL(string: urlString) {
                 Color.clear
@@ -148,6 +152,8 @@ struct FightDetailView: View {
             }
         }
         .frame(maxWidth: .infinity)
+        }
+        .buttonStyle(.plain)
     }
 
     private var centerVS: some View {

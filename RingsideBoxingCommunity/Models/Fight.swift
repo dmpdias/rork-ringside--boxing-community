@@ -48,13 +48,16 @@ nonisolated enum WeightClass: String, Sendable {
     case bantamweight = "Bantamweight"
 }
 
-struct Fighter: Identifiable, Sendable {
+struct Fighter: Identifiable, Sendable, Hashable {
     let id: String
     let name: String
     let nickname: String
     let record: String
     let country: String
     let imageURL: String?
+
+    static func == (lhs: Fighter, rhs: Fighter) -> Bool { lhs.id == rhs.id }
+    func hash(into hasher: inout Hasher) { hasher.combine(id) }
 }
 
 nonisolated enum FightTag: String, Sendable, CaseIterable {

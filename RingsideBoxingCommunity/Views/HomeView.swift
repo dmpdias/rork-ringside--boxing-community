@@ -78,6 +78,9 @@ struct HomeView: View {
             .navigationDestination(for: Fight.self) { fight in
                 FightDetailView(fight: fight)
             }
+            .navigationDestination(for: Fighter.self) { fighter in
+                FighterDetailView(fighter: fighter)
+            }
             .onAppear {
                 withAnimation(.easeOut(duration: 0.6)) {
                     appearAnimation = true
@@ -272,7 +275,7 @@ struct HomeView: View {
                                         )
                                     )
                                     .frame(width: 76, height: 76)
-                                FighterAvatar(imageURL: fight.fighterA.imageURL, name: fight.fighterA.name, size: 58)
+                                TappableFighterAvatar(fighter: fight.fighterA, size: 58)
                                     .overlay(
                                         Circle()
                                             .strokeBorder(
@@ -326,7 +329,7 @@ struct HomeView: View {
                                         )
                                     )
                                     .frame(width: 76, height: 76)
-                                FighterAvatar(imageURL: fight.fighterB.imageURL, name: fight.fighterB.name, size: 58)
+                                TappableFighterAvatar(fighter: fight.fighterB, size: 58)
                                     .overlay(
                                         Circle()
                                             .strokeBorder(
@@ -425,7 +428,7 @@ struct HomeView: View {
             .padding(.horizontal)
 
             HStack(spacing: 14) {
-                FighterAvatar(imageURL: highlight.fighter.imageURL, name: highlight.fighter.name, size: 64)
+                TappableFighterAvatar(fighter: highlight.fighter, size: 64)
                     .overlay(
                         Circle()
                             .strokeBorder(
@@ -601,6 +604,18 @@ struct FilterChip: View {
             )
         }
         .sensoryFeedback(.selection, trigger: isSelected)
+    }
+}
+
+struct TappableFighterAvatar: View {
+    let fighter: Fighter
+    var size: CGFloat = 30
+
+    var body: some View {
+        NavigationLink(value: fighter) {
+            FighterAvatar(imageURL: fighter.imageURL, name: fighter.name, size: size)
+        }
+        .buttonStyle(.plain)
     }
 }
 
@@ -808,7 +823,7 @@ struct FightRowCompact: View {
             VStack(spacing: 8) {
                 HStack(spacing: 0) {
                     HStack(spacing: 8) {
-                        FighterAvatar(imageURL: fight.fighterA.imageURL, name: fight.fighterA.name, size: 28)
+                        TappableFighterAvatar(fighter: fight.fighterA, size: 28)
                         Text(fight.fighterA.name.components(separatedBy: " ").last ?? "")
                             .font(.system(.subheadline, weight: .bold).width(.compressed))
                             .foregroundStyle(.white)
@@ -822,7 +837,7 @@ struct FightRowCompact: View {
                         Text(fight.fighterB.name.components(separatedBy: " ").last ?? "")
                             .font(.system(.subheadline, weight: .bold).width(.compressed))
                             .foregroundStyle(.white)
-                        FighterAvatar(imageURL: fight.fighterB.imageURL, name: fight.fighterB.name, size: 28)
+                        TappableFighterAvatar(fighter: fight.fighterB, size: 28)
                     }
                     .frame(maxWidth: .infinity, alignment: .trailing)
                 }
